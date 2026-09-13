@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Market Data Analysis & Signal Dashboard</title>
+  <title>TradePulse AI – Smart Trading Journal & Market Analytics</title>
 
   <!-- Plotly.js CDN -->
   <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
@@ -13,11 +13,16 @@
 </head>
 <body>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="spinner-overlay">
-    <div class="spinner"></div>
-    <div style="font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; color: #38bdf8;">
-      Fetching & Processing Analytics Data...
+  <!-- Top Marquee Ticker Bar -->
+  <div class="ticker-marquee">
+    <div class="marquee-content">
+      <span class="marquee-item">AAPL: <span class="text-green">$185.40 (+1.2%)</span></span>
+      <span class="marquee-item">MSFT: <span class="text-green">$422.10 (+0.8%)</span></span>
+      <span class="marquee-item">NVDA: <span class="text-green">$128.50 (+3.4%)</span></span>
+      <span class="marquee-item">TSLA: <span class="text-red">$224.80 (-1.5%)</span></span>
+      <span class="marquee-item">BTC-USD: <span class="text-green">$64,250 (+2.1%)</span></span>
+      <span class="marquee-item">NIFTY 50: <span class="text-green">25,350 (+0.6%)</span></span>
+      <span class="marquee-item">BANKNIFTY: <span class="text-green">51,800 (+0.9%)</span></span>
     </div>
   </div>
 
@@ -26,168 +31,180 @@
     <!-- Navbar Header -->
     <header class="navbar">
       <div class="brand">
-        <div class="brand-icon">📈</div>
+        <div class="brand-icon">⚡</div>
         <div class="brand-text">
-          <h1>Stock Market Analytics</h1>
-          <p>Real-Time Technical Analysis, Signal Crossovers & Risk Dashboard</p>
+          <h1>TradePulse AI</h1>
+          <p>Smart AI-Powered Trading Journal & Performance Analytics Platform</p>
         </div>
       </div>
 
-      <!-- Controls Header Bar -->
-      <div class="controls-bar">
-        <div class="control-group">
-          <label for="tickerSelect">Select Ticker:</label>
-          <select id="tickerSelect" class="select-input">
-            <option value="AAPL">AAPL - Apple Inc.</option>
-            <option value="MSFT">MSFT - Microsoft</option>
-            <option value="GOOGL">GOOGL - Alphabet</option>
-            <option value="NVDA">NVDA - NVIDIA</option>
-            <option value="TSLA">TSLA - Tesla Inc.</option>
-            <option value="BTC-USD">BTC - Bitcoin (USD)</option>
-          </select>
-        </div>
-
-        <div class="control-group">
-          <label for="customTickerInput">Custom:</label>
-          <input type="text" id="customTickerInput" class="text-input" placeholder="e.g. SPY" />
-        </div>
-
-        <div class="control-group">
-          <label for="startDate">From:</label>
-          <input type="date" id="startDate" class="date-input" />
-        </div>
-
-        <div class="control-group">
-          <label for="endDate">To:</label>
-          <input type="date" id="endDate" class="date-input" />
-        </div>
-
-        <button id="updateBtn" class="btn-primary">Update Analytics</button>
-      </div>
+      <button id="openTradeModalBtn" class="btn-add-trade">
+        <span>+ Log New Trade</span>
+      </button>
     </header>
-
-    <!-- Quick Ticker Pills -->
-    <div class="ticker-pills">
-      <div class="pill active" data-symbol="AAPL">AAPL (Apple)</div>
-      <div class="pill" data-symbol="MSFT">MSFT (Microsoft)</div>
-      <div class="pill" data-symbol="GOOGL">GOOGL (Alphabet)</div>
-      <div class="pill" data-symbol="NVDA">NVDA (NVIDIA)</div>
-      <div class="pill" data-symbol="TSLA">TSLA (Tesla)</div>
-      <div class="pill" data-symbol="BTC-USD">BTC (Bitcoin)</div>
-    </div>
 
     <!-- KPI Metric Cards Ribbon -->
     <div class="kpi-grid">
-      <div class="kpi-card green" id="kpiPriceCard">
-        <div class="kpi-title">Current Price</div>
-        <div class="kpi-value" id="kpiPrice">$0.00</div>
-        <div class="kpi-subtext text-green" id="kpiChange">+0.00%</div>
+      <div class="kpi-card green" id="kpiNetPnlCard">
+        <div class="kpi-title">Net Realized P&L</div>
+        <div class="kpi-value text-green" id="kpiNetPnl">+$0.00</div>
+        <div class="kpi-subtext text-green" id="kpiNetPnlPct">+0.00% Account Growth</div>
       </div>
 
-      <div class="kpi-card blue" id="kpiReturnCard">
-        <div class="kpi-title">Period Return</div>
-        <div class="kpi-value" id="kpiReturn">0.00%</div>
-        <div class="kpi-subtext text-cyan">Cumulative</div>
+      <div class="kpi-card blue">
+        <div class="kpi-title">Overall Win Rate</div>
+        <div class="kpi-value" id="kpiWinRate">0.0%</div>
+        <div class="kpi-subtext text-cyan" id="kpiWinCount">0 Wins / 0 Losses</div>
       </div>
 
       <div class="kpi-card purple">
-        <div class="kpi-title">Annual Volatility</div>
-        <div class="kpi-value" id="kpiVol">0.00%</div>
-        <div class="kpi-subtext text-muted">20-Day Rolling</div>
-      </div>
-
-      <div class="kpi-card red">
-        <div class="kpi-title">Max Drawdown</div>
-        <div class="kpi-value text-red" id="kpiDrawdown">0.00%</div>
-        <div class="kpi-subtext text-red">Peak to Trough</div>
+        <div class="kpi-title">Profit Factor</div>
+        <div class="kpi-value" id="kpiProfitFactor">0.00</div>
+        <div class="kpi-subtext text-muted">Gross Profit / Gross Loss</div>
       </div>
 
       <div class="kpi-card yellow">
-        <div class="kpi-title">Trading Signal</div>
-        <div class="kpi-value" id="kpiSignal">NEUTRAL</div>
-        <div class="kpi-subtext text-muted" id="kpiSignalType">SMA Crossover</div>
+        <div class="kpi-title">Total Trades Logged</div>
+        <div class="kpi-value" id="kpiTotalTrades">0</div>
+        <div class="kpi-subtext text-muted" id="kpiAvgTradePnl">Avg P&L: $0.00</div>
+      </div>
+
+      <div class="kpi-card green">
+        <div class="kpi-title">Avg Win / Avg Loss</div>
+        <div class="kpi-value" id="kpiWinLossRatio">0.00</div>
+        <div class="kpi-subtext text-green" id="kpiExpectancy">Expectancy: +$0.00</div>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="tabs-header">
-      <button class="tab-btn active" data-tab="tab1">📈 Price & Candlesticks</button>
-      <button class="tab-btn" data-tab="tab2">📊 Technical Indicators</button>
-      <button class="tab-btn" data-tab="tab3">🤖 Trading Signals & Backtest</button>
-      <button class="tab-btn" data-tab="tab4">⚖️ Risk & Return Analytics</button>
-      <button class="tab-btn" data-tab="tab5">🔗 Correlation Heatmap</button>
-      <button class="tab-btn" data-tab="tab6">💾 Raw Data & Export</button>
+      <button class="tab-btn active" data-tab="tab1">📖 Trade Journal & Log</button>
+      <button class="tab-btn" data-tab="tab2">📅 Monthly P&L Calendar</button>
+      <button class="tab-btn" data-tab="tab3">🤖 AI Coach & Behavioral Insights</button>
+      <button class="tab-btn" data-tab="tab4">📈 Performance & Equity Curve</button>
+      <button class="tab-btn" data-tab="tab5">📊 Technical Market Charting</button>
+      <button class="tab-btn" data-tab="tab6">💾 Data Backup & CSV Export</button>
     </div>
 
-    <!-- Tab 1: Price & Candlesticks -->
+    <!-- Tab 1: Trade Journal & Log -->
     <div id="tab1" class="tab-content active">
       <div class="chart-card">
         <div class="chart-header">
-          <div class="chart-title" id="priceChartTitle">Stock Price Candlestick & Moving Averages</div>
+          <div class="chart-title">Trading History & Execution Log</div>
+          <div style="display: flex; gap: 10px;">
+            <select id="filterStrategy" class="form-select" style="padding: 6px 12px; font-size: 12px;">
+              <option value="ALL">All Strategies</option>
+              <option value="Breakout">Breakout</option>
+              <option value="Reversal">Reversal</option>
+              <option value="Momentum">Momentum</option>
+              <option value="Scalp">Scalp</option>
+            </select>
+            <select id="filterEmotion" class="form-select" style="padding: 6px 12px; font-size: 12px;">
+              <option value="ALL">All Mindsets</option>
+              <option value="Disciplined">Disciplined</option>
+              <option value="FOMO">FOMO</option>
+              <option value="Revenge">Revenge</option>
+              <option value="Greed">Greed</option>
+            </select>
+          </div>
         </div>
-        <div id="pricePlot" class="plot-container"></div>
-      </div>
 
-      <div class="chart-card">
-        <div class="chart-header">
-          <div class="chart-title">Volume & Volatility Trends</div>
+        <div class="data-table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Ticker</th>
+                <th>Side</th>
+                <th>Type</th>
+                <th>Entry ($)</th>
+                <th>Exit ($)</th>
+                <th>Qty</th>
+                <th>P&L ($)</th>
+                <th>Strategy</th>
+                <th>Emotion</th>
+                <th>Mistake</th>
+                <th>Rating</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="journalTableBody"></tbody>
+          </table>
         </div>
-        <div id="volumePlot" class="plot-container" style="min-height: 320px;"></div>
       </div>
     </div>
 
-    <!-- Tab 2: Technical Indicators -->
+    <!-- Tab 2: Monthly P&L Calendar -->
     <div id="tab2" class="tab-content">
-      <div class="grid-2">
-        <div class="chart-card">
-          <div class="chart-header">
-            <div class="chart-title">Relative Strength Index (RSI 14)</div>
+      <div class="chart-card">
+        <div class="calendar-controls">
+          <div class="chart-title" id="calendarMonthTitle">P&L Calendar Heatmap</div>
+          <div style="display:flex; gap:8px;">
+            <button id="prevMonthBtn" class="form-input" style="cursor:pointer;">&lt; Prev</button>
+            <button id="nextMonthBtn" class="form-input" style="cursor:pointer;">Next &gt;</button>
           </div>
-          <div id="rsiPlot" class="plot-container" style="min-height: 360px;"></div>
         </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <div class="chart-title">MACD (12, 26, 9)</div>
-          </div>
-          <div id="macdPlot" class="plot-container" style="min-height: 360px;"></div>
-        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
       </div>
     </div>
 
-    <!-- Tab 3: Trading Signals & Backtesting -->
+    <!-- Tab 3: AI Coach & Behavioral Insights -->
     <div id="tab3" class="tab-content">
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">🤖 AI Performance Coach Diagnosis</div>
+          </div>
+          <div id="aiInsightsContainer"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Trading Mistakes Dollar Cost Breakdown</div>
+          </div>
+          <div id="mistakesPlot" class="plot-container" style="min-height: 360px;"></div>
+        </div>
+      </div>
+
       <div class="chart-card">
         <div class="chart-header">
-          <div class="chart-title">SMA Crossover Strategy Backtest vs. Buy & Hold ($10,000 Initial Investment)</div>
+          <div class="chart-title">Psychology & Emotional Mindset Impact on P&L</div>
         </div>
-        <div id="strategyPlot" class="plot-container"></div>
+        <div id="emotionPlot" class="plot-container" style="min-height: 380px;"></div>
       </div>
     </div>
 
-    <!-- Tab 4: Risk & Returns -->
+    <!-- Tab 4: Performance Analytics & Equity Curve -->
     <div id="tab4" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Cumulative Account Equity Curve ($)</div>
+        </div>
+        <div id="equityPlot" class="plot-container"></div>
+      </div>
+
       <div class="grid-2">
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title">Daily Returns Distribution & KDE Density</div>
+            <div class="chart-title">Strategy P&L Breakdown</div>
           </div>
-          <div id="distributionPlot" class="plot-container" style="min-height: 380px;"></div>
+          <div id="strategyPnlPlot" class="plot-container" style="min-height: 360px;"></div>
         </div>
 
         <div class="chart-card">
           <div class="chart-header">
-            <div class="chart-title">Advanced Quantitative Risk Summary</div>
+            <div class="chart-title">Risk & Statistical Performance Metrics</div>
           </div>
           <div style="padding: 10px 0;">
-            <table style="width: 100%;">
+            <table>
               <tbody>
-                <tr><td>Annualized Return</td><td id="riskAnnReturn" style="font-weight:700;">-</td></tr>
-                <tr><td>Annualized Volatility</td><td id="riskAnnVol" style="font-weight:700;">-</td></tr>
-                <tr><td>Sharpe Ratio (Rf=2%)</td><td id="riskSharpe" style="font-weight:700; color:#38bdf8;">-</td></tr>
-                <tr><td>Sortino Ratio</td><td id="riskSortino" style="font-weight:700; color:#10b981;">-</td></tr>
-                <tr><td>Max Drawdown</td><td id="riskMaxDD" style="font-weight:700; color:#f43f5e;">-</td></tr>
-                <tr><td>Value at Risk (VaR 95%)</td><td id="riskVaR95" style="font-weight:700; color:#f43f5e;">-</td></tr>
+                <tr><td>Sharpe Ratio (Rf=2%)</td><td id="statSharpe" style="font-weight:700; color:#38bdf8;">-</td></tr>
+                <tr><td>Sortino Ratio</td><td id="statSortino" style="font-weight:700; color:#10b981;">-</td></tr>
+                <tr><td>Max Drawdown</td><td id="statMaxDD" style="font-weight:700; color:#f43f5e;">-</td></tr>
+                <tr><td>Value at Risk (VaR 95%)</td><td id="statVaR" style="font-weight:700; color:#f43f5e;">-</td></tr>
+                <tr><td>Best Trade ($)</td><td id="statBestTrade" style="font-weight:700; color:#10b981;">-</td></tr>
+                <tr><td>Worst Trade ($)</td><td id="statWorstTrade" style="font-weight:700; color:#f43f5e;">-</td></tr>
               </tbody>
             </table>
           </div>
@@ -195,45 +212,171 @@
       </div>
     </div>
 
-    <!-- Tab 5: Correlation Heatmap -->
+    <!-- Tab 5: Technical Market Charting -->
     <div id="tab5" class="tab-content">
       <div class="chart-card">
         <div class="chart-header">
-          <div class="chart-title">Multi-Asset Return Correlation Heatmap</div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="chart-title">Live Technical Market Analysis</div>
+            <select id="techTickerSelect" class="select-input">
+              <option value="AAPL">AAPL - Apple Inc.</option>
+              <option value="MSFT">MSFT - Microsoft</option>
+              <option value="NVDA">NVDA - NVIDIA</option>
+              <option value="TSLA">TSLA - Tesla</option>
+              <option value="BTC-USD">BTC - Bitcoin</option>
+            </select>
+          </div>
         </div>
-        <div id="correlationPlot" class="plot-container"></div>
+        <div id="techPricePlot" class="plot-container"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">RSI Momentum (14)</div></div>
+          <div id="techRsiPlot" class="plot-container" style="min-height: 320px;"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">MACD (12, 26, 9)</div></div>
+          <div id="techMacdPlot" class="plot-container" style="min-height: 320px;"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Tab 6: Raw Data & Export -->
+    <!-- Tab 6: Backup & Export -->
     <div id="tab6" class="tab-content">
       <div class="chart-card">
         <div class="chart-header">
-          <div class="chart-title">Processed Historical Dataset</div>
-          <button id="downloadCsvBtn" class="btn-primary" style="padding: 6px 14px; font-size: 12px;">📥 Download CSV</button>
+          <div class="chart-title">Trade Journal Backup & CSV Export</div>
         </div>
-        <div class="data-table-container">
-          <table id="dataTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Close ($)</th>
-                <th>SMA 20 ($)</th>
-                <th>SMA 50 ($)</th>
-                <th>Daily Return (%)</th>
-                <th>RSI</th>
-                <th>Signal</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+          Export your complete trading journal data as a standard CSV spreadsheet or JSON backup file.
+        </p>
+        <div style="display: flex; gap: 16px;">
+          <button id="exportCsvBtn" class="btn-add-trade">📥 Export Journal to CSV</button>
+          <button id="resetJournalBtn" class="btn-add-trade" style="background: linear-gradient(135deg, var(--red-accent), var(--yellow-accent));">🔄 Reset to Sample Data</button>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- JavaScript Code Engine -->
+  <!-- Trade Log Modal -->
+  <div id="tradeModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">+ Log New Trade</div>
+        <button id="closeModalBtn" class="close-btn">&times;</button>
+      </div>
+
+      <form id="tradeForm" class="modal-body">
+        <input type="hidden" id="tradeId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tradeDate">Date:</label>
+            <input type="date" id="tradeDate" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeSymbol">Ticker / Symbol:</label>
+            <input type="text" id="tradeSymbol" class="form-input" placeholder="e.g. AAPL, NVDA, NIFTY" required style="text-transform: uppercase;" />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeSide">Side:</label>
+            <select id="tradeSide" class="form-select">
+              <option value="BUY">BUY / LONG</option>
+              <option value="SELL">SELL / SHORT</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeAsset">Asset Class:</label>
+            <select id="tradeAsset" class="form-select">
+              <option value="Stock">Equity / Stock</option>
+              <option value="Options">Options</option>
+              <option value="Futures">Futures</option>
+              <option value="Crypto">Crypto</option>
+              <option value="Forex">Forex</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeEntry">Entry Price ($):</label>
+            <input type="number" step="0.01" id="tradeEntry" class="form-input" placeholder="0.00" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeExit">Exit Price ($):</label>
+            <input type="number" step="0.01" id="tradeExit" class="form-input" placeholder="0.00" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeQty">Quantity / Shares:</label>
+            <input type="number" step="1" id="tradeQty" class="form-input" placeholder="100" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeStrategy">Strategy Setup:</label>
+            <select id="tradeStrategy" class="form-select">
+              <option value="Breakout">Breakout</option>
+              <option value="Reversal">Reversal</option>
+              <option value="Momentum">Momentum</option>
+              <option value="Scalp">Scalp</option>
+              <option value="Trend Following">Trend Following</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeEmotion">Mindset / Emotion:</label>
+            <select id="tradeEmotion" class="form-select">
+              <option value="Disciplined">Disciplined (Planned)</option>
+              <option value="FOMO">FOMO (Chasing)</option>
+              <option value="Revenge">Revenge Trade</option>
+              <option value="Greed">Greed (Over-held)</option>
+              <option value="Fear">Fear (Panic Exit)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeMistake">Execution Mistake:</label>
+            <select id="tradeMistake" class="form-select">
+              <option value="None">None (Flawless Execution)</option>
+              <option value="Chasing Price">Chasing Price</option>
+              <option value="Early Exit">Early Exit</option>
+              <option value="Over-leveraged">Over-leveraged</option>
+              <option value="No Stop Loss">No Stop Loss</option>
+              <option value="Moved Stop Loss">Moved Stop Loss</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="tradeRating">Execution Quality Rating:</label>
+            <select id="tradeRating" class="form-select">
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Perfect)</option>
+              <option value="4">⭐⭐⭐⭐ 4 Stars (Good)</option>
+              <option value="3">⭐⭐⭐ 3 Stars (Average)</option>
+              <option value="2">⭐⭐ 2 Stars (Flawed)</option>
+              <option value="1">⭐ 1 Star (Terrible)</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="tradeNotes">Trade Notes / Setup Description:</label>
+            <textarea id="tradeNotes" class="form-textarea" placeholder="Key takeaways, chart patterns, catalyst, or reasons for trade..."></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" id="cancelModalBtn" class="form-input" style="cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn-add-trade">Save Trade Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript App Logic -->
   <script src="app.js"></script>
 </body>
 </html>

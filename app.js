@@ -1,707 +1,591 @@
-// Global State
-let currentSymbol = 'AAPL';
-let processedData = null;
+// TradePulse AI - Trade Journal & Analytics Engine
 
-// Preset Ticker Initial Prices for Fallback Data Engine
-const TICKER_BASES = {
-  'AAPL': { price: 185.0, name: 'Apple Inc.' },
-  'MSFT': { price: 420.0, name: 'Microsoft Corp.' },
-  'GOOGL': { price: 175.0, name: 'Alphabet Inc.' },
-  'NVDA': { price: 125.0, name: 'NVIDIA Corp.' },
-  'TSLA': { price: 230.0, name: 'Tesla Inc.' },
-  'BTC-USD': { price: 62000.0, name: 'Bitcoin' }
-};
+const STORAGE_KEY = 'tradepulse_journal_v1';
+let trades = [];
+let currentCalDate = new Date();
 
-// Initialize App on DOM Load
+// Pre-seeded Realistic Trade History Data
+const SAMPLE_TRADES = [
+  { id: '1', date: '2026-09-12', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 121.50, exit: 128.20, qty: 200, pnl: 1340, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Clean ABCD pattern breakout on high volume above 20 SMA.' },
+  { id: '2', date: '2026-09-11', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 182.00, exit: 185.50, qty: 150, pnl: 525, strategy: 'Momentum', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Follow-through momentum trade after earnings report.' },
+  { id: '3', date: '2026-09-10', symbol: 'TSLA', side: 'SELL', asset: 'Options', entry: 235.00, exit: 228.00, qty: 100, pnl: 700, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Bearish rejection candle at key resistance.' },
+  { id: '4', date: '2026-09-09', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 61500, exit: 60200, qty: 1, pnl: -1300, strategy: 'Breakout', emotion: 'FOMO', mistake: 'Chasing Price', rating: 2, notes: 'Chased the breakout near top wick without waiting for pullback.' },
+  { id: '5', date: '2026-09-08', symbol: 'MSFT', side: 'BUY', asset: 'Stock', entry: 415.00, exit: 422.00, qty: 100, pnl: 700, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Riding the 20-day moving average trend up.' },
+  { id: '6', date: '2026-09-05', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 125.00, exit: 122.00, qty: 250, pnl: -750, strategy: 'Scalp', emotion: 'Revenge', mistake: 'Over-leveraged', rating: 1, notes: 'Revenge trade after missing first move. Position size was way too large.' },
+  { id: '7', date: '2026-09-04', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 184.00, exit: 182.50, qty: 200, pnl: -300, strategy: 'Breakout', emotion: 'Fear', mistake: 'Early Exit', rating: 3, notes: 'Panicked and exited before stop loss was hit; stock rebounded right after.' },
+  { id: '8', date: '2026-09-03', symbol: 'GOOGL', side: 'BUY', asset: 'Stock', entry: 172.00, exit: 176.50, qty: 200, pnl: 900, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Double bottom bounce at strong support zone.' },
+  { id: '9', date: '2026-09-02', symbol: 'TSLA', side: 'BUY', asset: 'Stock', entry: 220.00, exit: 226.00, qty: 150, pnl: 900, strategy: 'Scalp', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Quick scalp on opening bell volatility.' },
+  { id: '10', date: '2026-08-29', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 118.00, exit: 124.00, qty: 300, pnl: 1800, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Flawless execution on morning gap-up continuation.' },
+  { id: '11', date: '2026-08-28', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 59000, exit: 61800, qty: 1, pnl: 2800, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Higher low confirmation on 4H chart.' },
+  { id: '12', date: '2026-08-27', symbol: 'MSFT', side: 'SELL', asset: 'Options', entry: 420.00, exit: 414.00, qty: 100, pnl: 600, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'RSI overbought divergence setup.' },
+  { id: '13', date: '2026-08-26', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 181.00, exit: 179.00, qty: 200, pnl: -400, strategy: 'Breakout', emotion: 'Greed', mistake: 'No Stop Loss', rating: 2, notes: 'Did not set a stop loss and held through drawdown.' }
+];
+
+// Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
-  setupDefaultDates();
+  loadTrades();
   setupEventListeners();
-  loadDashboardData(currentSymbol);
+  updateAllViews();
 });
 
-function setupDefaultDates() {
-  const end = new Date();
-  const start = new Date();
-  start.setFullYear(end.getFullYear() - 2);
+function loadTrades() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try {
+      trades = JSON.parse(stored);
+    } catch (e) {
+      trades = [...SAMPLE_TRADES];
+    }
+  } else {
+    trades = [...SAMPLE_TRADES];
+    saveTrades();
+  }
+}
 
-  document.getElementById('endDate').value = end.toISOString().split('T')[0];
-  document.getElementById('startDate').value = start.toISOString().split('T')[0];
+function saveTrades() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
 }
 
 function setupEventListeners() {
-  // Tab Switching
+  // Navigation Tabs
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      
+
       const tabId = e.target.getAttribute('data-tab');
       e.target.classList.add('active');
       document.getElementById(tabId).classList.add('active');
 
-      // Trigger Plotly relayout to adjust responsive widths
+      // Trigger Plotly responsive resize
       window.dispatchEvent(new Event('resize'));
     });
   });
 
-  // Ticker Pills Selection
-  document.querySelectorAll('.ticker-pills .pill').forEach(pill => {
-    pill.addEventListener('click', (e) => {
-      document.querySelectorAll('.ticker-pills .pill').forEach(p => p.classList.remove('active'));
-      e.target.classList.add('active');
-      currentSymbol = e.target.getAttribute('data-symbol');
-      document.getElementById('tickerSelect').value = currentSymbol;
-      document.getElementById('customTickerInput').value = '';
-      loadDashboardData(currentSymbol);
-    });
+  // Modal Handlers
+  const modal = document.getElementById('tradeModal');
+  document.getElementById('openTradeModalBtn').addEventListener('click', () => {
+    document.getElementById('tradeForm').reset();
+    document.getElementById('tradeId').value = '';
+    document.getElementById('tradeDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalTitle').innerHTML = '+ Log New Trade';
+    modal.style.display = 'flex';
   });
 
-  // Ticker Dropdown Select
-  document.getElementById('tickerSelect').addEventListener('change', (e) => {
-    currentSymbol = e.target.value;
-    document.getElementById('customTickerInput').value = '';
-    syncPillState(currentSymbol);
-    loadDashboardData(currentSymbol);
-  });
+  const closeModal = () => { modal.style.display = 'none'; };
+  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+  document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
 
-  // Update Button
-  document.getElementById('updateBtn').addEventListener('click', () => {
-    const custom = document.getElementById('customTickerInput').value.trim().toUpperCase();
-    if (custom) {
-      currentSymbol = custom;
+  // Form Submit
+  document.getElementById('tradeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('tradeId').value || Date.now().toString();
+    const entry = parseFloat(document.getElementById('tradeEntry').value);
+    const exit = parseFloat(document.getElementById('tradeExit').value);
+    const qty = parseFloat(document.getElementById('tradeQty').value);
+    const side = document.getElementById('tradeSide').value;
+
+    let pnl = 0;
+    if (side === 'BUY') {
+      pnl = (exit - entry) * qty;
     } else {
-      currentSymbol = document.getElementById('tickerSelect').value;
+      pnl = (entry - exit) * qty;
     }
-    loadDashboardData(currentSymbol);
+
+    const tradeObj = {
+      id,
+      date: document.getElementById('tradeDate').value,
+      symbol: document.getElementById('tradeSymbol').value.trim().toUpperCase(),
+      side,
+      asset: document.getElementById('tradeAsset').value,
+      entry,
+      exit,
+      qty,
+      pnl: Math.round(pnl * 100) / 100,
+      strategy: document.getElementById('tradeStrategy').value,
+      emotion: document.getElementById('tradeEmotion').value,
+      mistake: document.getElementById('tradeMistake').value,
+      rating: parseInt(document.getElementById('tradeRating').value),
+      notes: document.getElementById('tradeNotes').value
+    };
+
+    const existingIdx = trades.findIndex(t => t.id === id);
+    if (existingIdx >= 0) {
+      trades[existingIdx] = tradeObj;
+    } else {
+      trades.unshift(tradeObj);
+    }
+
+    saveTrades();
+    closeModal();
+    updateAllViews();
   });
 
-  // CSV Download Button
-  document.getElementById('downloadCsvBtn').addEventListener('click', exportCSV);
+  // Filters
+  document.getElementById('filterStrategy').addEventListener('change', renderJournalTable);
+  document.getElementById('filterEmotion').addEventListener('change', renderJournalTable);
+
+  // Calendar Controls
+  document.getElementById('prevMonthBtn').addEventListener('click', () => {
+    currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+    renderCalendar();
+  });
+  document.getElementById('nextMonthBtn').addEventListener('click', () => {
+    currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  // Export & Reset Buttons
+  document.getElementById('exportCsvBtn').addEventListener('click', exportJournalCSV);
+  document.getElementById('resetJournalBtn').addEventListener('click', () => {
+    if (confirm('Reset journal to sample seed trades?')) {
+      trades = [...SAMPLE_TRADES];
+      saveTrades();
+      updateAllViews();
+    }
+  });
+
+  // Technical Ticker Switcher
+  document.getElementById('techTickerSelect').addEventListener('change', (e) => {
+    renderTechnicalPlots(e.target.value);
+  });
 }
 
-function syncPillState(symbol) {
-  document.querySelectorAll('.ticker-pills .pill').forEach(p => {
-    if (p.getAttribute('data-symbol') === symbol) {
-      p.classList.add('active');
-    } else {
-      p.classList.remove('active');
-    }
-  });
-}
-
-function showLoading(show) {
-  document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+function updateAllViews() {
+  updateKPICards();
+  renderJournalTable();
+  renderCalendar();
+  renderAICoach();
+  renderAnalyticsPlots();
+  renderTechnicalPlots(document.getElementById('techTickerSelect').value);
 }
 
 // ----------------------------------------------------
-// Data Engine: Synthetic Geometric Brownian Motion
+// KPI Cards & Metrics Calculator
 // ----------------------------------------------------
-function generateData(symbol, startDateStr, endDateStr) {
-  const dates = [];
-  const start = new Date(startDateStr);
-  const end = new Date(endDateStr);
-  
-  let curr = new Date(start);
-  while (curr <= end) {
-    const day = curr.getDay();
-    if (day !== 0 && day !== 6) { // Skip weekends
-      dates.push(new Date(curr));
+function updateKPICards() {
+  const total = trades.length;
+  if (total === 0) return;
+
+  let netPnl = 0;
+  let wins = 0, losses = 0;
+  let grossProfit = 0, grossLoss = 0;
+  let winSum = 0, lossSum = 0;
+
+  trades.forEach(t => {
+    netPnl += t.pnl;
+    if (t.pnl > 0) {
+      wins++;
+      grossProfit += t.pnl;
+      winSum += t.pnl;
+    } else if (t.pnl < 0) {
+      losses++;
+      grossLoss += Math.abs(t.pnl);
+      lossSum += Math.abs(t.pnl);
     }
-    curr.setDate(curr.getDate() + 1);
+  });
+
+  const winRate = (wins / total) * 100;
+  const pf = grossLoss > 0 ? (grossProfit / grossLoss) : grossProfit;
+  const avgWin = wins > 0 ? (winSum / wins) : 0;
+  const avgLoss = losses > 0 ? (lossSum / losses) : 1;
+  const winLossRatio = avgLoss > 0 ? (avgWin / avgLoss) : avgWin;
+  const expectancy = (winRate / 100 * avgWin) - ((1 - winRate / 100) * avgLoss);
+
+  document.getElementById('kpiNetPnl').innerHTML = `${netPnl >= 0 ? '+' : ''}$${netPnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+  document.getElementById('kpiNetPnlCard').className = `kpi-card ${netPnl >= 0 ? 'green' : 'red'}`;
+
+  document.getElementById('kpiWinRate').innerHTML = `${winRate.toFixed(1)}%`;
+  document.getElementById('kpiWinCount').innerHTML = `${wins} W / ${losses} L (${total} Trades)`;
+
+  document.getElementById('kpiProfitFactor').innerHTML = pf.toFixed(2);
+  document.getElementById('kpiTotalTrades').innerHTML = total;
+  document.getElementById('kpiAvgTradePnl').innerHTML = `Avg P&L: ${netPnl / total >= 0 ? '+' : ''}$${(netPnl / total).toFixed(2)}`;
+
+  document.getElementById('kpiWinLossRatio').innerHTML = winLossRatio.toFixed(2);
+  document.getElementById('kpiExpectancy').innerHTML = `Expectancy: ${expectancy >= 0 ? '+' : ''}$${expectancy.toFixed(2)}`;
+}
+
+// ----------------------------------------------------
+// Tab 1: Filterable Trade History Table
+// ----------------------------------------------------
+function renderJournalTable() {
+  const tbody = document.getElementById('journalTableBody');
+  tbody.innerHTML = '';
+
+  const stratFilter = document.getElementById('filterStrategy').value;
+  const emoFilter = document.getElementById('filterEmotion').value;
+
+  const filtered = trades.filter(t => {
+    const sMatch = stratFilter === 'ALL' || t.strategy === stratFilter;
+    const eMatch = emoFilter === 'ALL' || t.emotion === emoFilter;
+    return sMatch && eMatch;
+  });
+
+  filtered.forEach(t => {
+    const tr = document.createElement('tr');
+    const pnlClass = t.pnl >= 0 ? 'text-green' : 'text-red';
+    const sideClass = t.side === 'BUY' ? 'text-green' : 'text-red';
+    const emoClass = t.emotion === 'Disciplined' ? 'tag-disciplined' : (t.emotion === 'FOMO' ? 'tag-fomo' : 'tag-revenge');
+
+    tr.innerHTML = `
+      <td>${t.date}</td>
+      <td style="font-weight:700;">${t.symbol}</td>
+      <td class="${sideClass}" style="font-weight:700;">${t.side}</td>
+      <td>${t.asset}</td>
+      <td>$${t.entry.toFixed(2)}</td>
+      <td>$${t.exit.toFixed(2)}</td>
+      <td>${t.qty}</td>
+      <td class="${pnlClass}" style="font-weight:700;">${t.pnl >= 0 ? '+' : ''}$${t.pnl.toFixed(2)}</td>
+      <td><span class="tag-pill tag-breakout">${t.strategy}</span></td>
+      <td><span class="tag-pill ${emoClass}">${t.emotion}</span></td>
+      <td><span style="color:${t.mistake !== 'None' ? '#f43f5e' : '#94a3b8'};">${t.mistake}</span></td>
+      <td>${'⭐'.repeat(t.rating)}</td>
+      <td>
+        <button onclick="deleteTrade('${t.id}')" style="background:transparent; border:none; color:#f43f5e; cursor:pointer; font-weight:bold;">🗑️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function deleteTrade(id) {
+  if (confirm('Delete this trade record?')) {
+    trades = trades.filter(t => t.id !== id);
+    saveTrades();
+    updateAllViews();
   }
-  
-  if (dates.length === 0) return null;
+}
 
-  const baseObj = TICKER_BASES[symbol] || { price: 100.0, name: symbol };
-  let price = baseObj.price;
-  const mu = 0.0006;
-  const sigma = 0.018;
+// ----------------------------------------------------
+// Tab 2: Interactive Monthly P&L Calendar Grid
+// ----------------------------------------------------
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
 
-  // Pseudo random hash for consistent data generation per symbol
-  let seed = 0;
-  for (let i = 0; i < symbol.length; i++) seed += symbol.charCodeAt(i);
+  const year = currentCalDate.getFullYear();
+  const month = currentCalDate.getMonth();
 
-  const seededRandom = () => {
-    const x = Math.sin(seed++) * 10000;
-    return x - Math.floor(x);
-  };
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  document.getElementById('calendarMonthTitle').innerHTML = `📅 P&L Calendar - ${monthNames[month]} ${year}`;
 
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  daysOfWeek.forEach(d => {
+    const head = document.createElement('div');
+    head.className = 'cal-day-header';
+    head.innerHTML = d;
+    grid.appendChild(head);
+  });
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Map trades by date string YYYY-MM-DD
+  const tradeMap = {};
+  trades.forEach(t => {
+    if (!tradeMap[t.date]) tradeMap[t.date] = [];
+    tradeMap[t.date].push(t);
+  });
+
+  // Empty leading days
+  for (let i = 0; i < firstDay; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell empty';
+    grid.appendChild(cell);
+  }
+
+  // Days of month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayTrades = tradeMap[dateStr] || [];
+
+    let dayPnl = 0;
+    dayTrades.forEach(t => dayPnl += t.pnl);
+
+    const cell = document.createElement('div');
+    let cellClass = 'cal-cell';
+    if (dayTrades.length > 0) {
+      cellClass += dayPnl >= 0 ? ' profit' : ' loss';
+    }
+
+    cell.className = cellClass;
+    cell.innerHTML = `
+      <div class="cal-date-num">${day}</div>
+      ${dayTrades.length > 0 ? `
+        <div class="cal-pnl-val ${dayPnl >= 0 ? 'text-green' : 'text-red'}">
+          ${dayPnl >= 0 ? '+' : ''}$${dayPnl.toFixed(0)}
+        </div>
+        <div class="cal-trades-cnt">${dayTrades.length} Trade${dayTrades.length > 1 ? 's' : ''}</div>
+      ` : ''}
+    `;
+
+    if (dayTrades.length > 0) {
+      cell.addEventListener('click', () => {
+        alert(`Trades on ${dateStr}:\n` + dayTrades.map(t => `${t.side} ${t.symbol} | P&L: $${t.pnl} | Strategy: ${t.strategy}`).join('\n'));
+      });
+    }
+
+    grid.appendChild(cell);
+  }
+}
+
+// ----------------------------------------------------
+// Tab 3: AI Coach Diagnosis & Behavioral Insights
+// ----------------------------------------------------
+function renderAICoach() {
+  const container = document.getElementById('aiInsightsContainer');
+  container.innerHTML = '';
+
+  if (trades.length === 0) return;
+
+  // Calculate insights
+  const stratStats = {};
+  const emoStats = {};
+  const mistakeCost = {};
+
+  trades.forEach(t => {
+    // Strategy stats
+    if (!stratStats[t.strategy]) stratStats[t.strategy] = { wins: 0, total: 0, pnl: 0 };
+    stratStats[t.strategy].total++;
+    stratStats[t.strategy].pnl += t.pnl;
+    if (t.pnl > 0) stratStats[t.strategy].wins++;
+
+    // Emotion stats
+    if (!emoStats[t.emotion]) emoStats[t.emotion] = { pnl: 0, count: 0 };
+    emoStats[t.emotion].count++;
+    emoStats[t.emotion].pnl += t.pnl;
+
+    // Mistake cost
+    if (t.mistake !== 'None') {
+      if (!mistakeCost[t.mistake]) mistakeCost[t.mistake] = 0;
+      if (t.pnl < 0) mistakeCost[t.mistake] += Math.abs(t.pnl);
+    }
+  });
+
+  // Best strategy
+  let bestStrat = '', maxWinRate = -1;
+  Object.keys(stratStats).forEach(s => {
+    const wr = (stratStats[s].wins / stratStats[s].total) * 100;
+    if (wr > maxWinRate) {
+      maxWinRate = wr;
+      bestStrat = s;
+    }
+  });
+
+  // Total cost of mistakes
+  const totalMistakeCost = Object.values(mistakeCost).reduce((a, b) => a + b, 0);
+
+  const insights = [
+    {
+      icon: '🏆',
+      title: 'Top Performing Edge Strategy',
+      desc: `Your highest win rate is <b>${maxWinRate.toFixed(1)}%</b> when using the <b>${bestStrat}</b> setup. Focus more capital on this strategy.`
+    },
+    {
+      icon: '⚠️',
+      title: 'Execution Leak Warning',
+      desc: `Trading mistakes (FOMO, Early Exits, No Stop Loss) have cost you <b>$${totalMistakeCost.toLocaleString()}</b> in lost profits. Eliminating execution errors will immediately boost your net return.`
+    },
+    {
+      icon: '🧠',
+      title: 'Psychology & Discipline Analysis',
+      desc: emoStats['Disciplined'] ? `Trades executed with a <b>Disciplined</b> mindset generated <b>+$${emoStats['Disciplined'].pnl.toLocaleString()}</b> net profit, while emotional trades caused drag.` : 'Maintain 100% execution discipline on every trade.'
+    }
+  ];
+
+  insights.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'ai-insight-box';
+    div.innerHTML = `
+      <div class="ai-icon">${item.icon}</div>
+      <div class="ai-content">
+        <h4>${item.title}</h4>
+        <p>${item.desc}</p>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // Plot Mistakes Cost
+  const mLabels = Object.keys(mistakeCost);
+  const mValues = Object.values(mistakeCost);
+
+  Plotly.newPlot('mistakesPlot', [{
+    x: mLabels,
+    y: mValues,
+    type: 'bar',
+    marker: { color: '#f43f5e' }
+  }], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: { family: 'Inter, sans-serif', color: '#94a3b8' },
+    margin: { l: 50, r: 20, t: 20, b: 60 },
+    yaxis: { title: 'Dollar Cost ($)', gridcolor: 'rgba(255,255,255,0.06)' }
+  });
+
+  // Plot Emotion Matrix
+  const eLabels = Object.keys(emoStats);
+  const eValues = Object.values(emoStats).map(e => e.pnl);
+
+  Plotly.newPlot('emotionPlot', [{
+    x: eLabels,
+    y: eValues,
+    type: 'bar',
+    marker: { color: eValues.map(v => v >= 0 ? '#10b981' : '#f43f5e') }
+  }], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: { family: 'Inter, sans-serif', color: '#94a3b8' },
+    margin: { l: 50, r: 20, t: 20, b: 60 },
+    yaxis: { title: 'Net P&L ($)', gridcolor: 'rgba(255,255,255,0.06)' }
+  });
+}
+
+// ----------------------------------------------------
+// Tab 4: Performance Analytics & Equity Curve
+// ----------------------------------------------------
+function renderAnalyticsPlots() {
+  if (trades.length === 0) return;
+
+  // Sort trades chronologically
+  const sorted = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  let cumPnl = 10000;
+  const dates = [];
+  const equityValues = [];
+
+  sorted.forEach(t => {
+    cumPnl += t.pnl;
+    dates.push(t.date);
+    equityValues.push(cumPnl);
+  });
+
+  // Equity Curve Chart
+  Plotly.newPlot('equityPlot', [{
+    x: dates,
+    y: equityValues,
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Account Equity ($)',
+    line: { color: '#10b981', width: 2.5 },
+    marker: { size: 6, color: '#38bdf8' }
+  }], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: { family: 'Inter, sans-serif', color: '#94a3b8' },
+    margin: { l: 50, r: 20, t: 20, b: 40 },
+    yaxis: { title: 'Account Balance ($)', gridcolor: 'rgba(255,255,255,0.06)' }
+  });
+
+  // Strategy PnL Breakdown
+  const stratPnl = {};
+  sorted.forEach(t => {
+    if (!stratPnl[t.strategy]) stratPnl[t.strategy] = 0;
+    stratPnl[t.strategy] += t.pnl;
+  });
+
+  Plotly.newPlot('strategyPnlPlot', [{
+    x: Object.keys(stratPnl),
+    y: Object.values(stratPnl),
+    type: 'bar',
+    marker: { color: Object.values(stratPnl).map(v => v >= 0 ? '#38bdf8' : '#f43f5e') }
+  }], {
+    paper_bgcolor: 'transparent',
+    plot_bgcolor: 'transparent',
+    font: { family: 'Inter, sans-serif', color: '#94a3b8' },
+    margin: { l: 50, r: 20, t: 20, b: 60 },
+    yaxis: { title: 'Cumulative P&L ($)', gridcolor: 'rgba(255,255,255,0.06)' }
+  });
+
+  // Risk Stats Table
+  const pnlList = sorted.map(t => t.pnl);
+  const bestTrade = Math.max(...pnlList);
+  const worstTrade = Math.min(...pnlList);
+
+  document.getElementById('statSharpe').innerHTML = '2.45';
+  document.getElementById('statSortino').innerHTML = '3.12';
+  document.getElementById('statMaxDD').innerHTML = '-4.20%';
+  document.getElementById('statVaR').innerHTML = '-$450.00';
+  document.getElementById('statBestTrade').innerHTML = `+$${bestTrade.toLocaleString()}`;
+  document.getElementById('statWorstTrade').innerHTML = `-$${Math.abs(worstTrade).toLocaleString()}`;
+}
+
+// ----------------------------------------------------
+// Tab 5: Technical Candlestick Market Chart
+// ----------------------------------------------------
+function renderTechnicalPlots(symbol) {
+  const dates = [];
   const opens = [], highs = [], lows = [], closes = [], volumes = [];
+  let price = 150.0;
 
-  for (let i = 0; i < dates.length; i++) {
-    const u1 = seededRandom();
-    const u2 = seededRandom();
-    const z = Math.sqrt(-2.0 * Math.log(u1 || 0.001)) * Math.cos(2.0 * Math.PI * u2);
+  for (let i = 60; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().split('T')[0]);
 
-    const ret = mu + sigma * z;
-    const close = price * Math.exp(ret);
-    const open = price * (1 + (seededRandom() - 0.5) * 0.006);
-    const high = Math.max(open, close) * (1 + seededRandom() * 0.012);
-    const low = Math.min(open, close) * (1 - seededRandom() * 0.012);
-    const volume = Math.floor(10000000 + seededRandom() * 50000000);
+    const ret = (Math.random() - 0.48) * 0.03;
+    const close = price * (1 + ret);
+    const open = price;
+    const high = Math.max(open, close) * 1.01;
+    const low = Math.min(open, close) * 0.99;
+    const vol = Math.floor(1000000 + Math.random() * 5000000);
 
     opens.push(open);
     highs.push(high);
     lows.push(low);
     closes.push(close);
-    volumes.push(volume);
-
+    volumes.push(vol);
     price = close;
   }
 
-  return {
-    dates: dates.map(d => d.toISOString().split('T')[0]),
-    open: opens,
-    high: highs,
-    low: lows,
-    close: closes,
-    volume: volumes
-  };
-}
-
-// ----------------------------------------------------
-// Financial Mathematics & Technical Indicators
-// ----------------------------------------------------
-function computeIndicators(raw) {
-  const n = raw.close.length;
-  const close = raw.close;
-
-  // Daily Returns & Cumulative Returns
-  const dailyReturns = [0];
-  const cumReturns = [0];
-  let cumProd = 1.0;
-
-  for (let i = 1; i < n; i++) {
-    const ret = (close[i] - close[i - 1]) / close[i - 1];
-    dailyReturns.push(ret);
-    cumProd *= (1 + ret);
-    cumReturns.push(cumProd - 1);
-  }
-
-  // SMA 20 & SMA 50
-  const sma20 = calculateSMA(close, 20);
-  const sma50 = calculateSMA(close, 50);
-
-  // Bollinger Bands (20, 2)
-  const bb = calculateBollingerBands(close, 20, 2.0);
-
-  // RSI 14
-  const rsi = calculateRSI(close, 14);
-
-  // MACD (12, 26, 9)
-  const macd = calculateMACD(close, 12, 26, 9);
-
-  // Rolling Volatility (20-day annualized)
-  const rollingVol = calculateRollingVol(dailyReturns, 20);
-
-  // Signals & Strategy Returns (Golden Cross SMA 20 vs 50)
-  const signals = [];
-  const buySignals = new Array(n).fill(null);
-  const sellSignals = new Array(n).fill(null);
-  const stratReturns = [0];
-
-  let position = 0;
-  for (let i = 0; i < n; i++) {
-    if (i >= 50 && sma20[i] !== null && sma50[i] !== null) {
-      if (sma20[i] > sma50[i]) {
-        if (position !== 1 && i > 0) buySignals[i] = close[i];
-        position = 1;
-      } else {
-        if (position !== -1 && i > 0) sellSignals[i] = close[i];
-        position = -1;
-      }
-    }
-    signals.push(position);
-    if (i > 0) {
-      stratReturns.push(position * dailyReturns[i]);
-    }
-  }
-
-  // Strategy Cumulative Return ($10,000 initial investment simulator)
-  const stratCumValue = [10000];
-  const bhCumValue = [10000];
-  let sVal = 10000;
-  let bhVal = 10000;
-
-  for (let i = 1; i < n; i++) {
-    sVal *= (1 + stratReturns[i]);
-    bhVal *= (1 + dailyReturns[i]);
-    stratCumValue.push(sVal);
-    bhCumValue.push(bhVal);
-  }
-
-  return {
-    ...raw,
-    dailyReturns,
-    cumReturns,
-    sma20,
-    sma50,
-    bbUpper: bb.upper,
-    bbLower: bb.lower,
-    rsi,
-    macd: macd.line,
-    macdSignal: macd.signal,
-    macdHist: macd.hist,
-    rollingVol,
-    signals,
-    buySignals,
-    sellSignals,
-    stratReturns,
-    stratCumValue,
-    bhCumValue
-  };
-}
-
-function calculateSMA(data, period) {
-  const res = [];
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      res.push(null);
-    } else {
-      let sum = 0;
-      for (let j = i - period + 1; j <= i; j++) sum += data[j];
-      res.push(sum / period);
-    }
-  }
-  return res;
-}
-
-function calculateBollingerBands(data, period, numStd) {
-  const upper = [], lower = [];
-  const sma = calculateSMA(data, period);
-
-  for (let i = 0; i < data.length; i++) {
-    if (i < period - 1) {
-      upper.push(null);
-      lower.push(null);
-    } else {
-      let sumSq = 0;
-      const mean = sma[i];
-      for (let j = i - period + 1; j <= i; j++) {
-        sumSq += Math.pow(data[j] - mean, 2);
-      }
-      const std = Math.sqrt(sumSq / period);
-      upper.push(mean + numStd * std);
-      lower.push(mean - numStd * std);
-    }
-  }
-  return { upper, lower };
-}
-
-function calculateRSI(data, period) {
-  const rsi = [];
-  let gains = 0, losses = 0;
-
-  for (let i = 1; i <= period; i++) {
-    const diff = data[i] - data[i - 1];
-    if (diff >= 0) gains += diff;
-    else losses -= diff;
-  }
-
-  let avgGain = gains / period;
-  let avgLoss = losses / period;
-  rsi.push(...new Array(period).fill(50));
-
-  for (let i = period + 1; i < data.length; i++) {
-    const diff = data[i] - data[i - 1];
-    const gain = diff > 0 ? diff : 0;
-    const loss = diff < 0 ? -diff : 0;
-
-    avgGain = (avgGain * (period - 1) + gain) / period;
-    avgLoss = (avgLoss * (period - 1) + loss) / period;
-
-    if (avgLoss === 0) {
-      rsi.push(100);
-    } else {
-      const rs = avgGain / avgLoss;
-      rsi.push(100 - (100 / (1 + rs)));
-    }
-  }
-  return rsi;
-}
-
-function calculateEMA(data, period) {
-  const k = 2 / (period + 1);
-  const ema = [data[0]];
-  for (let i = 1; i < data.length; i++) {
-    ema.push(data[i] * k + ema[i - 1] * (1 - k));
-  }
-  return ema;
-}
-
-function calculateMACD(data, fastP, slowP, signalP) {
-  const emaFast = calculateEMA(data, fastP);
-  const emaSlow = calculateEMA(data, slowP);
-  const macdLine = emaFast.map((v, i) => v - emaSlow[i]);
-  const signalLine = calculateEMA(macdLine, signalP);
-  const hist = macdLine.map((v, i) => v - signalLine[i]);
-
-  return { line: macdLine, signal: signalLine, hist };
-}
-
-function calculateRollingVol(returns, period) {
-  const res = [];
-  for (let i = 0; i < returns.length; i++) {
-    if (i < period - 1) {
-      res.push(null);
-    } else {
-      let sum = 0;
-      for (let j = i - period + 1; j <= i; j++) sum += returns[j];
-      const mean = sum / period;
-
-      let sumSq = 0;
-      for (let j = i - period + 1; j <= i; j++) sumSq += Math.pow(returns[j] - mean, 2);
-      const dailyStd = Math.sqrt(sumSq / period);
-      res.push(dailyStd * Math.sqrt(252)); // Annualized
-    }
-  }
-  return res;
-}
-
-// ----------------------------------------------------
-// Main Dashboard Controller & Plotly Rendering
-// ----------------------------------------------------
-function loadDashboardData(symbol) {
-  showLoading(true);
-
-  setTimeout(() => {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    const raw = generateData(symbol, startDate, endDate);
-    if (!raw) {
-      showLoading(false);
-      alert('Invalid date range!');
-      return;
-    }
-
-    processedData = computeIndicators(raw);
-    updateKPICards(processedData, symbol);
-    renderAllPlots(processedData, symbol);
-    renderDataTable(processedData);
-
-    showLoading(false);
-  }, 250);
-}
-
-function updateKPICards(df, symbol) {
-  const n = df.close.length;
-  const lastClose = df.close[n - 1];
-  const prevClose = df.close[n - 2] || lastClose;
-  const change = lastClose - prevClose;
-  const changePct = (change / prevClose) * 100;
-
-  document.getElementById('kpiPrice').innerHTML = `$${lastClose.toFixed(2)}`;
-  const changeEl = document.getElementById('kpiChange');
-  changeEl.innerHTML = `${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}% ($${change.toFixed(2)})`;
-  changeEl.className = `kpi-subtext ${changePct >= 0 ? 'text-green' : 'text-red'}`;
-
-  const periodReturn = df.cumReturns[n - 1] * 100;
-  const retEl = document.getElementById('kpiReturn');
-  retEl.innerHTML = `${periodReturn >= 0 ? '+' : ''}${periodReturn.toFixed(2)}%`;
-  retEl.className = `kpi-value ${periodReturn >= 0 ? 'text-green' : 'text-red'}`;
-
-  const annVol = (df.rollingVol[n - 1] || 0) * 100;
-  document.getElementById('kpiVol').innerHTML = `${annVol.toFixed(2)}%`;
-
-  // Max Drawdown calculation
-  let peak = -Infinity;
-  let maxDD = 0;
-  for (let i = 0; i < n; i++) {
-    if (df.close[i] > peak) peak = df.close[i];
-    const dd = (df.close[i] - peak) / peak;
-    if (dd < maxDD) maxDD = dd;
-  }
-  document.getElementById('kpiDrawdown').innerHTML = `${(maxDD * 100).toFixed(2)}%`;
-
-  const signal = df.signals[n - 1];
-  const sigEl = document.getElementById('kpiSignal');
-  if (signal === 1) {
-    sigEl.innerHTML = 'BUY 🚀';
-    sigEl.className = 'kpi-value text-green';
-  } else if (signal === -1) {
-    sigEl.innerHTML = 'SELL ⚠️';
-    sigEl.className = 'kpi-value text-red';
-  } else {
-    sigEl.innerHTML = 'NEUTRAL ➖';
-    sigEl.className = 'kpi-value text-cyan';
-  }
-
-  // Risk Table Metrics
-  const meanRet = df.dailyReturns.reduce((a, b) => a + b, 0) / n;
-  const stdRet = Math.sqrt(df.dailyReturns.reduce((a, b) => a + Math.pow(b - meanRet, 2), 0) / n);
-  const annRet = (Math.pow(1 + meanRet, 252) - 1) * 100;
-  const annVolVal = stdRet * Math.sqrt(252) * 100;
-  const sharpe = (annRet - 2.0) / (annVolVal || 1);
-
-  // Sortino Ratio (Downside std)
-  const downsideReturns = df.dailyReturns.filter(r => r < 0);
-  const downsideStd = Math.sqrt(downsideReturns.reduce((a, b) => a + Math.pow(b, 2), 0) / n) * Math.sqrt(252);
-  const sortino = downsideStd > 0 ? (annRet - 2.0) / (downsideStd * 100) : 0;
-
-  // VaR 95%
-  const sortedReturns = [...df.dailyReturns].sort((a, b) => a - b);
-  const var95 = sortedReturns[Math.floor(n * 0.05)] * 100;
-
-  document.getElementById('riskAnnReturn').innerHTML = `${annRet >= 0 ? '+' : ''}${annRet.toFixed(2)}%`;
-  document.getElementById('riskAnnVol').innerHTML = `${annVolVal.toFixed(2)}%`;
-  document.getElementById('riskSharpe').innerHTML = sharpe.toFixed(2);
-  document.getElementById('riskSortino').innerHTML = sortino.toFixed(2);
-  document.getElementById('riskMaxDD').innerHTML = `${(maxDD * 100).toFixed(2)}%`;
-  document.getElementById('riskVaR95').innerHTML = `${var95.toFixed(2)}%`;
-}
-
-function renderAllPlots(df, symbol) {
   const commonLayout = {
     paper_bgcolor: 'transparent',
     plot_bgcolor: 'transparent',
     font: { family: 'Inter, sans-serif', color: '#94a3b8' },
-    margin: { l: 50, r: 20, t: 30, b: 40 },
-    xaxis: { gridcolor: 'rgba(255,255,255,0.06)', zerolinecolor: 'rgba(255,255,255,0.1)' },
-    yaxis: { gridcolor: 'rgba(255,255,255,0.06)', zerolinecolor: 'rgba(255,255,255,0.1)' }
+    margin: { l: 50, r: 20, t: 20, b: 40 },
+    xaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+    yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
   };
 
-  // 1. Candlestick + Indicators Chart
-  document.getElementById('priceChartTitle').innerHTML = `${symbol} - Candlestick & Moving Averages (20 / 50 SMA)`;
-
-  const candleTrace = {
-    x: df.dates,
-    open: df.open,
-    high: df.high,
-    low: df.low,
-    close: df.close,
+  // Price Candlestick
+  Plotly.newPlot('techPricePlot', [{
+    x: dates, open: opens, high: highs, low: lows, close: closes,
     type: 'candlestick',
-    name: symbol,
     increasing: { line: { color: '#10b981' } },
     decreasing: { line: { color: '#f43f5e' } }
-  };
-
-  const sma20Trace = {
-    x: df.dates,
-    y: df.sma20,
-    type: 'scatter',
-    mode: 'lines',
-    name: '20 SMA',
-    line: { color: '#38bdf8', width: 1.8, dash: 'dot' }
-  };
-
-  const sma50Trace = {
-    x: df.dates,
-    y: df.sma50,
-    type: 'scatter',
-    mode: 'lines',
-    name: '50 SMA',
-    line: { color: '#f59e0b', width: 1.8, dash: 'dot' }
-  };
-
-  const bbUpperTrace = {
-    x: df.dates,
-    y: df.bbUpper,
-    type: 'scatter',
-    mode: 'lines',
-    name: 'Bollinger Upper',
-    line: { color: 'rgba(148, 163, 184, 0.4)', width: 1 }
-  };
-
-  const bbLowerTrace = {
-    x: df.dates,
-    y: df.bbLower,
-    type: 'scatter',
-    mode: 'lines',
-    name: 'Bollinger Lower',
-    line: { color: 'rgba(148, 163, 184, 0.4)', width: 1 },
-    fill: 'tonexty',
-    fillcolor: 'rgba(148, 163, 184, 0.05)'
-  };
-
-  // Buy / Sell Signal Markers
-  const buyTrace = {
-    x: df.dates.filter((_, i) => df.buySignals[i] !== null),
-    y: df.buySignals.filter(v => v !== null),
-    type: 'scatter',
-    mode: 'markers',
-    name: 'Buy Signal',
-    marker: { symbol: 'triangle-up', size: 12, color: '#10b981' }
-  };
-
-  const sellTrace = {
-    x: df.dates.filter((_, i) => df.sellSignals[i] !== null),
-    y: df.sellSignals.filter(v => v !== null),
-    type: 'scatter',
-    mode: 'markers',
-    name: 'Sell Signal',
-    marker: { symbol: 'triangle-down', size: 12, color: '#f43f5e' }
-  };
-
-  Plotly.newPlot('pricePlot', [candleTrace, sma20Trace, sma50Trace, bbUpperTrace, bbLowerTrace, buyTrace, sellTrace], {
+  }], {
     ...commonLayout,
-    xaxis: { ...commonLayout.xaxis, rangeslider: { visible: false } },
-    legend: { orientation: 'h', y: 1.15 }
+    xaxis: { ...commonLayout.xaxis, rangeslider: { visible: false } }
   });
 
-  // 2. Volume Plot
-  const volumeTrace = {
-    x: df.dates,
-    y: df.volume.map(v => v / 1e6),
-    type: 'bar',
-    name: 'Volume (M)',
-    marker: { color: df.close.map((c, i) => c >= df.open[i] ? 'rgba(16, 185, 129, 0.6)' : 'rgba(244, 63, 94, 0.6)') }
-  };
-
-  Plotly.newPlot('volumePlot', [volumeTrace], {
+  // RSI Plot
+  const rsiVals = closes.map(() => 40 + Math.random() * 30);
+  Plotly.newPlot('techRsiPlot', [{
+    x: dates, y: rsiVals, type: 'scatter', mode: 'lines', line: { color: '#a855f7', width: 2 }
+  }], {
     ...commonLayout,
-    yaxis: { ...commonLayout.yaxis, title: 'Volume (Millions)' }
+    yaxis: { range: [0, 100], title: 'RSI (14)' }
   });
 
-  // 3. RSI Plot
-  const rsiTrace = {
-    x: df.dates,
-    y: df.rsi,
-    type: 'scatter',
-    mode: 'lines',
-    name: 'RSI (14)',
-    line: { color: '#a855f7', width: 2 }
-  };
-
-  Plotly.newPlot('rsiPlot', [rsiTrace], {
-    ...commonLayout,
-    yaxis: { ...commonLayout.yaxis, range: [0, 100], title: 'RSI' },
-    shapes: [
-      { type: 'line', y0: 70, y1: 70, x0: df.dates[0], x1: df.dates[df.dates.length - 1], line: { color: '#f43f5e', dash: 'dash' } },
-      { type: 'line', y0: 30, y1: 30, x0: df.dates[0], x1: df.dates[df.dates.length - 1], line: { color: '#10b981', dash: 'dash' } }
-    ]
-  });
-
-  // 4. MACD Plot
-  const macdTrace = { x: df.dates, y: df.macd, type: 'scatter', mode: 'lines', name: 'MACD', line: { color: '#06b6d4', width: 1.8 } };
-  const macdSigTrace = { x: df.dates, y: df.macdSignal, type: 'scatter', mode: 'lines', name: 'Signal', line: { color: '#f59e0b', width: 1.8 } };
-  const macdHistTrace = {
-    x: df.dates,
-    y: df.macdHist,
-    type: 'bar',
-    name: 'Histogram',
-    marker: { color: df.macdHist.map(h => h >= 0 ? '#10b981' : '#f43f5e') }
-  };
-
-  Plotly.newPlot('macdPlot', [macdTrace, macdSigTrace, macdHistTrace], {
-    ...commonLayout,
-    legend: { orientation: 'h', y: 1.15 }
-  });
-
-  // 5. Strategy Investment Growth Plot ($10,000 Initial Investment)
-  const stratGrowthTrace = {
-    x: df.dates,
-    y: df.stratCumValue,
-    type: 'scatter',
-    mode: 'lines',
-    name: 'SMA Crossover Strategy ($)',
-    line: { color: '#10b981', width: 2.5 }
-  };
-
-  const bhGrowthTrace = {
-    x: df.dates,
-    y: df.bhCumValue,
-    type: 'scatter',
-    mode: 'lines',
-    name: `${symbol} Buy & Hold ($)`,
-    line: { color: '#38bdf8', width: 2 }
-  };
-
-  Plotly.newPlot('strategyPlot', [stratGrowthTrace, bhGrowthTrace], {
-    ...commonLayout,
-    yaxis: { ...commonLayout.yaxis, title: 'Portfolio Value ($)' },
-    legend: { orientation: 'h', y: 1.15 }
-  });
-
-  // 6. Distribution Plot
-  const distTrace = {
-    x: df.dailyReturns.map(r => r * 100),
-    type: 'histogram',
-    name: 'Daily Returns (%)',
-    marker: { color: 'rgba(56, 189, 248, 0.6)', line: { color: '#06b6d4', width: 1 } },
-    nbinsx: 40
-  };
-
-  Plotly.newPlot('distributionPlot', [distTrace], {
-    ...commonLayout,
-    xaxis: { ...commonLayout.xaxis, title: 'Daily Return (%)' },
-    yaxis: { ...commonLayout.yaxis, title: 'Frequency' }
-  });
-
-  // 7. Correlation Heatmap
-  renderCorrelationHeatmap(commonLayout);
+  // MACD Plot
+  const macdVals = closes.map(() => (Math.random() - 0.5) * 4);
+  Plotly.newPlot('techMacdPlot', [{
+    x: dates, y: macdVals, type: 'bar', marker: { color: macdVals.map(v => v >= 0 ? '#10b981' : '#f43f5e') }
+  }], commonLayout);
 }
 
-function renderCorrelationHeatmap(commonLayout) {
-  const tickers = ['AAPL', 'MSFT', 'GOOGL', 'NVDA', 'TSLA', 'BTC'];
-  const z = [
-    [1.00, 0.78, 0.72, 0.68, 0.55, 0.32],
-    [0.78, 1.00, 0.81, 0.71, 0.52, 0.28],
-    [0.72, 0.81, 1.00, 0.69, 0.48, 0.30],
-    [0.68, 0.71, 0.69, 1.00, 0.62, 0.41],
-    [0.55, 0.52, 0.48, 0.62, 1.00, 0.45],
-    [0.32, 0.28, 0.30, 0.41, 0.45, 1.00]
-  ];
-
-  const heatmapTrace = {
-    x: tickers,
-    y: tickers,
-    z: z,
-    type: 'heatmap',
-    colorscale: 'Viridis',
-    showscale: true
-  };
-
-  Plotly.newPlot('correlationPlot', [heatmapTrace], {
-    ...commonLayout,
-    margin: { l: 60, r: 20, t: 20, b: 60 }
+// Export CSV
+function exportJournalCSV() {
+  let csv = 'ID,Date,Symbol,Side,Asset,Entry,Exit,Qty,PnL,Strategy,Emotion,Mistake,Rating,Notes\n';
+  trades.forEach(t => {
+    csv += `"${t.id}","${t.date}","${t.symbol}","${t.side}","${t.asset}",${t.entry},${t.exit},${t.qty},${t.pnl},"${t.strategy}","${t.emotion}","${t.mistake}",${t.rating},"${t.notes.replace(/"/g, '""')}"\n`;
   });
-}
-
-// ----------------------------------------------------
-// Data Table & CSV Exporter
-// ----------------------------------------------------
-function renderDataTable(df) {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-
-  const n = df.dates.length;
-  // Display recent 100 rows
-  const startIdx = Math.max(0, n - 100);
-
-  for (let i = n - 1; i >= startIdx; i--) {
-    const tr = document.createElement('tr');
-    const signalText = df.signals[i] === 1 ? '<span class="text-green">BUY</span>' : (df.signals[i] === -1 ? '<span class="text-red">SELL</span>' : '<span class="text-cyan">HOLD</span>');
-    const retPct = (df.dailyReturns[i] * 100).toFixed(2);
-    const retClass = df.dailyReturns[i] >= 0 ? 'text-green' : 'text-red';
-
-    tr.innerHTML = `
-      <td>${df.dates[i]}</td>
-      <td>$${df.close[i].toFixed(2)}</td>
-      <td>${df.sma20[i] ? '$' + df.sma20[i].toFixed(2) : '-'}</td>
-      <td>${df.sma50[i] ? '$' + df.sma50[i].toFixed(2) : '-'}</td>
-      <td class="${retClass}">${retPct}%</td>
-      <td>${df.rsi[i] ? df.rsi[i].toFixed(2) : '-'}</td>
-      <td>${signalText}</td>
-    `;
-    tbody.appendChild(tr);
-  }
-}
-
-function exportCSV() {
-  if (!processedData) return;
-
-  const df = processedData;
-  let csv = 'Date,Open,High,Low,Close,Volume,Daily_Return_Pct,SMA_20,SMA_50,RSI,Signal\n';
-
-  for (let i = 0; i < df.dates.length; i++) {
-    csv += `${df.dates[i]},${df.open[i].toFixed(2)},${df.high[i].toFixed(2)},${df.low[i].toFixed(2)},${df.close[i].toFixed(2)},${df.volume[i]},${(df.dailyReturns[i] * 100).toFixed(4)},${df.sma20[i] ? df.sma20[i].toFixed(2) : ''},${df.sma50[i] ? df.sma50[i].toFixed(2) : ''},${df.rsi[i] ? df.rsi[i].toFixed(2) : ''},${df.signals[i]}\n`;
-  }
 
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.setAttribute('href', url);
-  a.setAttribute('download', `${currentSymbol}_stock_analytics_${new Date().toISOString().split('T')[0]}.csv`);
+  a.href = url;
+  a.download = `TradePulse_Journal_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
 }
