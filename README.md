@@ -1,84 +1,61 @@
-# 📈 Stock Market Data Analysis Dashboard
+# 📈 Stock Market Data Analysis & Signal Dashboard
 
-An interactive Python analytics dashboard built with **Pandas**, **Matplotlib**, **Seaborn**, and **Streamlit** to clean, process, visualize historical stock price data, and generate trading signals.
-
----
-
-## 🌟 Key Features
-
-1. **Stock Data Loader & Preprocessing**:
-   - Live data ingestion from Yahoo Finance (`yfinance`) for customizable tickers and date ranges.
-   - Intelligent offline fallback using Geometric Brownian Motion to generate synthetic stock data.
-   - Cleans missing values, handles duplicates, and calculates daily returns, log returns, and cumulative returns.
-
-2. **Technical Indicators & Metrics**:
-   - **Simple Moving Averages (SMA)** & **Exponential Moving Averages (EMA)** (20-day, 50-day, 200-day).
-   - **Rolling Volatility** (20-day annualized risk metric).
-   - **Bollinger Bands** (Upper, Lower, Middle bands).
-   - **Momentum Indicators**: Relative Strength Index (RSI - 14 day) and MACD (Moving Average Convergence Divergence with signal line & histogram).
-
-3. **Trading Signal & Strategy Backtesting**:
-   - Golden Cross / Death Cross moving average crossover trading signal generation.
-   - Backtest engine evaluating strategy cumulative returns against Buy & Hold benchmark with Sharpe Ratio and Max Drawdown calculation.
-
-4. **Interactive Dashboard**:
-   - Interactive KPI cards for Current Price, Period Return, Volatility, Drawdown, and Live Signal.
-   - Tabbed layout featuring technical analysis, risk distribution, strategy backtests, multi-stock correlation heatmaps, and raw data CSV exports.
+An interactive, responsive standalone **Web Frontend Application** built with **HTML5**, **CSS3 (Glassmorphism design)**, **JavaScript**, and **Plotly.js** to clean, process, visualize historical stock price data, compute technical indicators, and backtest trading strategies.
 
 ---
 
-## 📁 Project Architecture
+## 🌟 Features & Highlights
+
+1. **Instant VS Code Live Server Compatibility (`127.0.0.1:5500`)**:
+   - Zero server requirements! Simply click **"Go Live"** in VS Code or double-click `index.html` to launch.
+2. **1-Click Cloud Deployment**:
+   - Native support for **Vercel**, **Netlify**, **GitHub Pages**, and **Streamlit Community Cloud**.
+3. **Interactive Financial Charting (Plotly.js)**:
+   - Interactive Candlestick charts with range selectors, volume overlays, hover tooltips, and signal markers.
+   - Subplots for RSI (14-day) and MACD (12, 26, 9 with histogram bars).
+   - $10,000 Initial Investment Strategy Backtest growth comparison against Buy & Hold benchmark.
+   - Multi-asset return correlation heatmap.
+4. **Quantitative Metrics & Risk Indicators**:
+   - SMA 20, SMA 50, Bollinger Bands (20, 2), 20-Day Annualized Volatility.
+   - Sharpe Ratio, Sortino Ratio, Max Drawdown %, and Value at Risk (VaR 95%).
+5. **CSV Dataset Exporter**:
+   - Download calculated indicators and processed data on demand.
+
+---
+
+## 📁 Repository Structure
 
 ```
 stock-market-dashboard/
 │
-├── data_loader.py       # Data fetching & synthetic data generator fallback
-├── analytics.py         # Technical indicators, volatility, RSI, MACD & backtesting engine
-├── visualizer.py        # Matplotlib & Seaborn custom plot routines
-├── app.py               # Main Streamlit web dashboard application
-├── requirements.txt     # Python dependencies
-└── README.md            # Project documentation & guide
+├── index.html           # Main Web Dashboard UI entry point
+├── styles.css           # Modern Dark Glassmorphism CSS design system
+├── app.js               # Client-side Quantitative Math & Plotly.js Charting Engine
+├── vercel.json          # Vercel deployment configuration
+├── README.md            # Project documentation & usage guide
+│
+├── app.py               # (Optional) Streamlit Python dashboard app
+├── data_loader.py       # Python data fetching module
+├── analytics.py         # Python quantitative metrics engine
+├── visualizer.py        # Python Matplotlib/Seaborn plotting module
+└── requirements.txt     # Python dependencies
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 How to Run Locally
 
-### 1. Prerequisites & Installation
+### Method 1: VS Code Live Server (Easiest)
+1. Open the project folder in VS Code.
+2. Click **"Go Live"** at the bottom right status bar (or right-click `index.html` $\rightarrow$ *Open with Live Server*).
+3. The dashboard opens instantly at `http://127.0.0.1:5500`.
 
-Ensure you have Python 3.9+ installed.
-
-```bash
-# Clone or navigate to the workspace directory
-cd stock-market-dashboard
-
-# Install required packages
-pip install -r requirements.txt
-```
-
-### 2. Launch the Interactive Dashboard
-
-```bash
-streamlit run app.py
-```
-
-The app will open automatically in your browser at `http://localhost:8501`.
+### Method 2: Open `index.html` directly in any Browser
+Double-click `index.html` to open it in Chrome, Edge, Brave, or Firefox!
 
 ---
 
-## 📐 Formulas & Methodology
+## 🌐 Cloud Deployment (Vercel & GitHub Pages)
 
-- **Daily Return**: 
-  $$R_t = \frac{P_t - P_{t-1}}{P_{t-1}}$$
-
-- **Annualized Volatility**: 
-  $$\sigma_{\text{annual}} = \sigma_{\text{daily}} \times \sqrt{252}$$
-
-- **Sharpe Ratio** ($R_f = 0.02$): 
-  $$\text{Sharpe} = \frac{R_{\text{annual}} - R_f}{\sigma_{\text{annual}}}$$
-
-- **RSI (Relative Strength Index)**: 
-  $$\text{RSI} = 100 - \left( \frac{100}{1 + \frac{\text{Avg Gain}}{\text{Avg Loss}}} \right)$$
-
-- **Bollinger Bands**: 
-  $$\text{Upper / Lower} = \text{SMA}_{20} \pm (2 \times \sigma_{20})$$
+- **Vercel**: Import repository `ankit1713sr/stock-market-dashboard` on Vercel. It deploys instantly as a static website.
+- **GitHub Pages**: Go to Repository Settings $\rightarrow$ Pages $\rightarrow$ Select `main` branch $\rightarrow$ Save.
