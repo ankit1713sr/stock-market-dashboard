@@ -676,3 +676,23 @@ function exportJournalCSV() {
   a.download = `TradePulse_Journal_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
 }
+
+// Global Tab & Modal Navigation Helpers for Home Page
+function switchToTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+  const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if (targetBtn) targetBtn.classList.add('active');
+
+  const targetContent = document.getElementById(tabId);
+  if (targetContent) targetContent.classList.add('active');
+
+  window.dispatchEvent(new Event('resize'));
+}
+
+function openAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.style.display = 'flex';
+}
+
