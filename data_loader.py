@@ -9,11 +9,23 @@ logger = logging.getLogger(__name__)
 POPULAR_TICKERS = {
     "AAPL": "Apple Inc.",
     "MSFT": "Microsoft Corporation",
-    "GOOGL": "Alphabet Inc.",
+    "GOOGL": "Alphabet Inc. (Google)",
     "NVDA": "NVIDIA Corporation",
     "TSLA": "Tesla, Inc.",
     "AMZN": "Amazon.com Inc.",
-    "BTC-USD": "Bitcoin (USD)"
+    "META": "Meta Platforms, Inc.",
+    "NFLX": "Netflix, Inc.",
+    "AMD": "Advanced Micro Devices, Inc.",
+    "INTC": "Intel Corporation",
+    "JPM": "JPMorgan Chase & Co.",
+    "V": "Visa Inc.",
+    "DIS": "The Walt Disney Company",
+    "BTC-USD": "Bitcoin (USD)",
+    "ETH-USD": "Ethereum (USD)",
+    "SOL-USD": "Solana (USD)",
+    "RELIANCE.NS": "Reliance Industries Ltd.",
+    "TCS.NS": "Tata Consultancy Services",
+    "INFY": "Infosys Limited"
 }
 
 def generate_synthetic_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
@@ -30,8 +42,13 @@ def generate_synthetic_data(ticker: str, start_date: str, end_date: str) -> pd.D
     
     # Base initial prices per ticker family
     base_prices = {
-        "AAPL": 180.0, "MSFT": 410.0, "GOOGL": 175.0,
-        "NVDA": 120.0, "TSLA": 220.0, "AMZN": 185.0, "BTC-USD": 60000.0
+        "AAPL": 185.0, "MSFT": 420.0, "GOOGL": 175.0,
+        "NVDA": 125.0, "TSLA": 225.0, "AMZN": 185.0,
+        "META": 510.0, "NFLX": 650.0, "AMD": 150.0,
+        "INTC": 30.0, "JPM": 210.0, "V": 270.0,
+        "DIS": 95.0, "BTC-USD": 64000.0, "ETH-USD": 3400.0,
+        "SOL-USD": 140.0, "RELIANCE.NS": 3000.0, "TCS.NS": 4200.0,
+        "INFY": 22.0
     }
     s0 = base_prices.get(ticker, 100.0)
     mu = 0.0005  # Daily drift

@@ -7,18 +7,24 @@ let currentCalDate = new Date();
 // Pre-seeded Realistic Trade History Data
 const SAMPLE_TRADES = [
   { id: '1', date: '2026-09-12', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 121.50, exit: 128.20, qty: 200, pnl: 1340, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Clean ABCD pattern breakout on high volume above 20 SMA.' },
-  { id: '2', date: '2026-09-11', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 182.00, exit: 185.50, qty: 150, pnl: 525, strategy: 'Momentum', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Follow-through momentum trade after earnings report.' },
-  { id: '3', date: '2026-09-10', symbol: 'TSLA', side: 'SELL', asset: 'Options', entry: 235.00, exit: 228.00, qty: 100, pnl: 700, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Bearish rejection candle at key resistance.' },
-  { id: '4', date: '2026-09-09', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 61500, exit: 60200, qty: 1, pnl: -1300, strategy: 'Breakout', emotion: 'FOMO', mistake: 'Chasing Price', rating: 2, notes: 'Chased the breakout near top wick without waiting for pullback.' },
-  { id: '5', date: '2026-09-08', symbol: 'MSFT', side: 'BUY', asset: 'Stock', entry: 415.00, exit: 422.00, qty: 100, pnl: 700, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Riding the 20-day moving average trend up.' },
-  { id: '6', date: '2026-09-05', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 125.00, exit: 122.00, qty: 250, pnl: -750, strategy: 'Scalp', emotion: 'Revenge', mistake: 'Over-leveraged', rating: 1, notes: 'Revenge trade after missing first move. Position size was way too large.' },
-  { id: '7', date: '2026-09-04', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 184.00, exit: 182.50, qty: 200, pnl: -300, strategy: 'Breakout', emotion: 'Fear', mistake: 'Early Exit', rating: 3, notes: 'Panicked and exited before stop loss was hit; stock rebounded right after.' },
-  { id: '8', date: '2026-09-03', symbol: 'GOOGL', side: 'BUY', asset: 'Stock', entry: 172.00, exit: 176.50, qty: 200, pnl: 900, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Double bottom bounce at strong support zone.' },
-  { id: '9', date: '2026-09-02', symbol: 'TSLA', side: 'BUY', asset: 'Stock', entry: 220.00, exit: 226.00, qty: 150, pnl: 900, strategy: 'Scalp', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Quick scalp on opening bell volatility.' },
-  { id: '10', date: '2026-08-29', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 118.00, exit: 124.00, qty: 300, pnl: 1800, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Flawless execution on morning gap-up continuation.' },
-  { id: '11', date: '2026-08-28', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 59000, exit: 61800, qty: 1, pnl: 2800, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Higher low confirmation on 4H chart.' },
-  { id: '12', date: '2026-08-27', symbol: 'MSFT', side: 'SELL', asset: 'Options', entry: 420.00, exit: 414.00, qty: 100, pnl: 600, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'RSI overbought divergence setup.' },
-  { id: '13', date: '2026-08-26', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 181.00, exit: 179.00, qty: 200, pnl: -400, strategy: 'Breakout', emotion: 'Greed', mistake: 'No Stop Loss', rating: 2, notes: 'Did not set a stop loss and held through drawdown.' }
+  { id: '2', date: '2026-09-11', symbol: 'META', side: 'BUY', asset: 'Stock', entry: 505.00, exit: 518.50, qty: 50, pnl: 675, strategy: 'Momentum', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Strong AI ad revenue breakout continuation.' },
+  { id: '3', date: '2026-09-11', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 182.00, exit: 185.50, qty: 150, pnl: 525, strategy: 'Momentum', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Follow-through momentum trade after earnings report.' },
+  { id: '4', date: '2026-09-10', symbol: 'TSLA', side: 'SELL', asset: 'Options', entry: 235.00, exit: 228.00, qty: 100, pnl: 700, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Bearish rejection candle at key resistance.' },
+  { id: '5', date: '2026-09-09', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 61500, exit: 60200, qty: 1, pnl: -1300, strategy: 'Breakout', emotion: 'FOMO', mistake: 'Chasing Price', rating: 2, notes: 'Chased the breakout near top wick without waiting for pullback.' },
+  { id: '6', date: '2026-09-08', symbol: 'AMZN', side: 'BUY', asset: 'Stock', entry: 182.00, exit: 187.00, qty: 150, pnl: 750, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Cloud sector strength bounce at 20-day EMA.' },
+  { id: '7', date: '2026-09-08', symbol: 'MSFT', side: 'BUY', asset: 'Stock', entry: 415.00, exit: 422.00, qty: 100, pnl: 700, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Riding the 20-day moving average trend up.' },
+  { id: '8', date: '2026-09-05', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 125.00, exit: 122.00, qty: 250, pnl: -750, strategy: 'Scalp', emotion: 'Revenge', mistake: 'Over-leveraged', rating: 1, notes: 'Revenge trade after missing first move. Position size was way too large.' },
+  { id: '9', date: '2026-09-05', symbol: 'NFLX', side: 'BUY', asset: 'Stock', entry: 640.00, exit: 658.00, qty: 40, pnl: 720, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Subscriber surge catalyst gap-and-go.' },
+  { id: '10', date: '2026-09-04', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 184.00, exit: 182.50, qty: 200, pnl: -300, strategy: 'Breakout', emotion: 'Fear', mistake: 'Early Exit', rating: 3, notes: 'Panicked and exited before stop loss was hit; stock rebounded right after.' },
+  { id: '11', date: '2026-09-03', symbol: 'GOOGL', side: 'BUY', asset: 'Stock', entry: 172.00, exit: 176.50, qty: 200, pnl: 900, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Double bottom bounce at strong support zone.' },
+  { id: '12', date: '2026-09-02', symbol: 'ETH-USD', side: 'BUY', asset: 'Crypto', entry: 3300, exit: 3450, qty: 5, pnl: 750, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Breakout above $3400 resistance level.' },
+  { id: '13', date: '2026-09-02', symbol: 'TSLA', side: 'BUY', asset: 'Stock', entry: 220.00, exit: 226.00, qty: 150, pnl: 900, strategy: 'Scalp', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Quick scalp on opening bell volatility.' },
+  { id: '14', date: '2026-08-29', symbol: 'AMD', side: 'BUY', asset: 'Stock', entry: 142.00, exit: 148.50, qty: 150, pnl: 975, strategy: 'Momentum', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Semi-conductor sector momentum push.' },
+  { id: '15', date: '2026-08-29', symbol: 'NVDA', side: 'BUY', asset: 'Stock', entry: 118.00, exit: 124.00, qty: 300, pnl: 1800, strategy: 'Breakout', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Flawless execution on morning gap-up continuation.' },
+  { id: '16', date: '2026-08-28', symbol: 'JPM', side: 'BUY', asset: 'Stock', entry: 205.00, exit: 211.00, qty: 100, pnl: 600, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'Banking sector rally after Fed rate announcement.' },
+  { id: '17', date: '2026-08-28', symbol: 'BTC-USD', side: 'BUY', asset: 'Crypto', entry: 59000, exit: 61800, qty: 1, pnl: 2800, strategy: 'Trend Following', emotion: 'Disciplined', mistake: 'None', rating: 5, notes: 'Higher low confirmation on 4H chart.' },
+  { id: '18', date: '2026-08-27', symbol: 'MSFT', side: 'SELL', asset: 'Options', entry: 420.00, exit: 414.00, qty: 100, pnl: 600, strategy: 'Reversal', emotion: 'Disciplined', mistake: 'None', rating: 4, notes: 'RSI overbought divergence setup.' },
+  { id: '19', date: '2026-08-26', symbol: 'AAPL', side: 'BUY', asset: 'Stock', entry: 181.00, exit: 179.00, qty: 200, pnl: -400, strategy: 'Breakout', emotion: 'Greed', mistake: 'No Stop Loss', rating: 2, notes: 'Did not set a stop loss and held through drawdown.' }
 ];
 
 // Initialize Application
@@ -517,7 +523,16 @@ function renderAnalyticsPlots() {
 function renderTechnicalPlots(symbol) {
   const dates = [];
   const opens = [], highs = [], lows = [], closes = [], volumes = [];
-  let price = 150.0;
+
+  const basePrices = {
+    'AAPL': 185.0, 'MSFT': 420.0, 'NVDA': 125.0, 'TSLA': 225.0,
+    'GOOGL': 175.0, 'AMZN': 185.0, 'META': 510.0, 'NFLX': 650.0,
+    'AMD': 150.0, 'INTC': 30.0, 'JPM': 210.0, 'V': 270.0, 'DIS': 95.0,
+    'BTC-USD': 64000.0, 'ETH-USD': 3400.0, 'SOL-USD': 140.0,
+    'RELIANCE.NS': 3000.0, 'TCS.NS': 4200.0, 'INFY': 22.0
+  };
+
+  let price = basePrices[symbol] || 150.0;
 
   for (let i = 60; i >= 0; i--) {
     const d = new Date();

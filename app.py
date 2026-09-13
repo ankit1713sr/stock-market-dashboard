@@ -252,7 +252,7 @@ with tab5:
     selected_corr_tickers = st.multiselect(
         "Select Tickers for Correlation Analysis:",
         options=list(POPULAR_TICKERS.keys()),
-        default=["AAPL", "MSFT", "GOOGL", "NVDA", "BTC-USD"]
+        default=["AAPL", "MSFT", "NVDA", "META", "AMZN", "BTC-USD", "ETH-USD"]
     )
     
     if len(selected_corr_tickers) > 1:
