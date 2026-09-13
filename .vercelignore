@@ -1,0 +1,8 @@
+app.py
+requirements.txt
+data_loader.py
+analytics.py
+visualizer.py
+test_pipeline.py
+__pycache__/
+.git/
