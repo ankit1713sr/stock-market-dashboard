@@ -8,31 +8,40 @@ Designed for stock, options, crypto, and forex traders to log trades, track net 
 
 ## 🌟 Core Modules & Features
 
-1. **📖 Interactive Trade Logger & Journal**:
-   - Modal trade entry form (Date, Ticker, Side, Asset Class, Entry/Exit Price, Quantity, Strategy, Emotion, Mistake, Rating, Notes).
-   - Searchable, filterable trade history log with color-coded P&L indicators and strategy pills.
-   - Client-side LocalStorage data persistence.
+1. **🔐 Authentication & Multi-Account Switcher**:
+   - Cyber-Dark Glassmorphism Login Modal with Quick 1-Click Demo Trader Login.
+   - Dynamic top navbar user profile badge (*Ankit Mishra - PRO TRADER*) and multi-account switcher (**Personal Portfolio**, **Prop Firm Funded Account**, **Paper Sandbox**).
 
-2. **📅 Interactive Monthly P&L Calendar**:
+2. **📖 Interactive Trade Logger & Journal**:
+   - Modal trade entry form (Date, Ticker, Side, Asset Class, Entry/Exit Price, Quantity, Strategy, Emotion, Mistake, Rating, Notes, Chart Snapshot URL).
+   - Searchable, filterable trade history log with color-coded P&L indicators, strategy pills, and **📸 Lightbox Chart Snapshot Viewers**.
+
+3. **🛡️ Risk Guard & Position Size Calculator**:
+   - **Smart Position Sizer**: Calculates exact recommended shares/contracts based on Account Balance, Risk %, Entry Price, and Stop Loss.
+   - **Daily Risk Protocol Guard**: Configurable daily max loss limit with automatic **Risk Protocol Warning Alert** banners.
+
+4. **📚 Execution Strategy Playbook & Checklist**:
+   - Interactive pre-trade verification checklist enforcing setup alignment, volume spikes, and risk:reward ≥ 2:1 discipline.
+
+5. **📰 Economic Macro News Feed**:
+   - High-impact economic calendar widget tracking CPI Inflation reports, FOMC Rate Decisions, and ECB Monetary Policy announcements.
+
+6. **📅 Interactive Monthly P&L Calendar**:
    - Visual monthly calendar grid displaying daily net P&L ($ amount and % return) for every day of the month.
-   - Deep Green for high-profit days, Light Green for small wins, Red for losses, and Dark Gray for non-trading days.
-   - Click on any date cell to inspect all trades executed on that specific day.
 
-3. **🤖 AI Coach & Behavioral Insights Engine**:
+7. **🤖 AI Coach & Behavioral Insights Engine**:
    - Automated AI performance diagnosis generating plain-English insights (highest win-rate setup, best trading days, emotion drag).
    - **Mistakes Cost Breakdown**: Visualizing the exact dollar loss caused by trading mistakes (e.g. FOMO, Early Exit, Over-leveraging).
-   - **Psychology & Emotion Matrix**: P&L breakdown categorized by emotional state (Disciplined vs Revenge vs Greed vs Fear).
 
-4. **📈 Equity Curve & Performance Analytics**:
+8. **📈 Equity Curve & Performance Analytics**:
    - Interactive Plotly Equity Curve tracking account balance over time.
    - Win Rate %, Profit Factor, Avg Win / Avg Loss ratio, Sharpe Ratio, Sortino Ratio, Max Drawdown %.
 
-5. **📊 Technical Market Charting**:
-   - Interactive Candlestick charts with range selectors, volume overlays, SMA 20/50, and Bollinger Bands.
-   - Momentum subplots for RSI (14) and MACD (12, 26, 9).
+9. **📊 Technical Market Charting**:
+   - Expanded live technical charts supporting US Megacap Tech (AAPL, MSFT, NVDA, TSLA, META, AMZN, NFLX, AMD, INTC), Finance (JPM, V, DIS), Crypto (BTC, ETH, SOL), and Indian Equities (RELIANCE, TCS, INFY).
 
-6. **💾 Backup & CSV Data Export**:
-   - Export your entire trading journal dataset to a standard CSV file or reset to default sample seed data.
+10. **💾 Backup & CSV Data Export**:
+    - Export your entire trading journal dataset to a standard CSV file or reset to default sample seed data.
 
 ---
 

@@ -45,10 +45,35 @@
         </div>
       </div>
 
-      <button id="openTradeModalBtn" class="btn-add-trade">
-        <span>+ Log New Trade</span>
-      </button>
+      <div class="user-profile-bar">
+        <div class="profile-pill" id="userProfilePill">
+          <div class="avatar-badge" id="avatarBadge">AM</div>
+          <div class="profile-info">
+            <div class="profile-name" id="userName">Ankit Mishra <span class="badge-pro">PRO</span></div>
+            <select id="activeAccountSelect" class="account-selector">
+              <option value="Personal">💼 Personal Portfolio ($25K)</option>
+              <option value="PropFirm">🏦 Prop Firm Account ($100K)</option>
+              <option value="Paper">🧪 Paper Trading Sandbox</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="openAuthModalBtn" class="form-input" style="cursor:pointer; font-weight:600;">🔐 Login</button>
+
+        <button id="openTradeModalBtn" class="btn-add-trade">
+          <span>+ Log New Trade</span>
+        </button>
+      </div>
     </header>
+
+    <!-- Risk Protocol Breach Alert Banner (Hidden by Default) -->
+    <div id="riskGuardBanner" class="risk-alert-banner" style="display: none;">
+      <div class="risk-alert-title">
+        <span>🚨 RISK PROTOCOL WARNING:</span>
+        <span id="riskAlertMsg">Daily Max Loss Threshold ($1,000) Breached! Stop trading immediately to preserve capital.</span>
+      </div>
+      <button onclick="dismissRiskAlert()" class="form-input" style="cursor:pointer; font-size:12px; background:rgba(244,63,94,0.3); border-color:#f43f5e; color:#fff;">Acknowledge</button>
+    </div>
 
     <!-- KPI Metric Cards Ribbon -->
     <div class="kpi-grid">
@@ -90,6 +115,9 @@
       <button class="tab-btn" data-tab="tab3">🤖 AI Coach & Behavioral Insights</button>
       <button class="tab-btn" data-tab="tab4">📈 Performance & Equity Curve</button>
       <button class="tab-btn" data-tab="tab5">📊 Technical Market Charting</button>
+      <button class="tab-btn" data-tab="tab7">🛡️ Risk Guard & Position Size Calculator</button>
+      <button class="tab-btn" data-tab="tab8">📚 Execution Strategy Playbook</button>
+      <button class="tab-btn" data-tab="tab9">📰 Economic News & Macro Calendar</button>
       <button class="tab-btn" data-tab="tab6">💾 Data Backup & CSV Export</button>
     </div>
 
@@ -272,6 +300,122 @@
       </div>
     </div>
 
+    <!-- Tab 7: Risk Guard & Position Size Calculator -->
+    <div id="tab7" class="tab-content">
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">📐 Smart Position Sizing & Risk Calculator</div>
+          </div>
+          <form id="posCalcForm" class="calc-card">
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Account Balance ($):</label>
+              <input type="number" id="calcAccount" class="form-input" value="25000" required />
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Risk Per Trade (%):</label>
+              <input type="number" step="0.1" id="calcRiskPct" class="form-input" value="1.0" required />
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Entry Price ($):</label>
+              <input type="number" step="0.01" id="calcEntry" class="form-input" placeholder="e.g. 185.00" required />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Stop Loss Price ($):</label>
+              <input type="number" step="0.01" id="calcStop" class="form-input" placeholder="e.g. 182.50" required />
+            </div>
+            <button type="button" id="btnCalculatePos" class="btn-add-trade" style="width:100%; justify-content:center;">Calculate Position Size</button>
+          </form>
+
+          <div class="calc-result-box" id="calcResultBox">
+            <div style="font-size:12px; font-weight:600; color:var(--text-muted);">RECOMMENDED SHARES / CONTRACTS</div>
+            <div class="calc-result-val" id="calcResultQty">0 Shares</div>
+            <div style="font-size:13px; color:var(--text-main); margin-top:4px;" id="calcResultDollar">Dollar Risk: $250.00 (1.0%)</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">🛡️ Daily Risk Guard Protocol Settings</div>
+          </div>
+          <div style="padding:10px 0;">
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">
+              Protect your capital by setting strict maximum daily loss thresholds. The system triggers an immediate protocol warning if exceeded.
+            </p>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Daily Max Loss Limit ($):</label>
+              <input type="number" id="settingMaxLoss" class="form-input" value="1000" />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Max Consecutive Loss Streak Allowable:</label>
+              <input type="number" id="settingMaxStreak" class="form-input" value="3" />
+            </div>
+            <button id="saveRiskSettingsBtn" class="btn-add-trade">Save Risk Protocol Rules</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 8: Strategy Playbook & Execution Rules -->
+    <div id="tab8" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📚 Pre-Trade Execution Playbook Checklist</div>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+          Enforce discipline by verifying setup criteria before taking any live order entry.
+        </p>
+
+        <div class="playbook-item">
+          <input type="checkbox" id="pb1" class="playbook-checkbox">
+          <label for="pb1" style="cursor:pointer; color:var(--text-main);">1. Higher Timeframe Alignment: 4H & Daily trend direction confirmed.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb2" class="playbook-checkbox">
+          <label for="pb2" style="cursor:pointer; color:var(--text-main);">2. Key Level Rejection / Breakout: Clear horizontal support/resistance test.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb3" class="playbook-checkbox">
+          <label for="pb3" style="cursor:pointer; color:var(--text-main);">3. Volume Confirmation: Relative volume spike above 20-period average.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb4" class="playbook-checkbox">
+          <label for="pb4" style="cursor:pointer; color:var(--text-main);">4. Risk:Reward Ratio Check: Planned profit target is at least 2x stop loss distance.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb5" class="playbook-checkbox">
+          <label for="pb5" style="cursor:pointer; color:var(--text-main);">5. Emotional State Check: Calm, focused, and free from FOMO or revenge mindset.</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 9: Economic News & Macro Calendar -->
+    <div id="tab9" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📰 High-Impact Macro Economic Events & Catalyst Feed</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Currency / Country</th>
+              <th>Event Catalyst</th>
+              <th>Impact Tier</th>
+              <th>Forecast</th>
+              <th>Prior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>08:30 EST</td><td>🇺🇸 USD</td><td>Core Inflation CPI (MoM)</td><td><span class="tag-pill tag-fomo">HIGH IMPACT</span></td><td>0.3%</td><td>0.2%</td></tr>
+            <tr><td>14:00 EST</td><td>🇺🇸 USD</td><td>FOMC Federal Reserve Rate Decision</td><td><span class="tag-pill tag-revenge">CRITICAL</span></td><td>5.25%</td><td>5.50%</td></tr>
+            <tr><td>04:30 EST</td><td>🇪🇺 EUR</td><td>ECB Monetary Policy Statement</td><td><span class="tag-pill tag-fomo">HIGH IMPACT</span></td><td>3.75%</td><td>3.75%</td></tr>
+            <tr><td>09:30 EST</td><td>🇮🇳 INR</td><td>RBI Benchmark Repo Rate Announcement</td><td><span class="tag-pill tag-breakout">MEDIUM</span></td><td>6.50%</td><td>6.50%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Tab 6: Backup & Export -->
     <div id="tab6" class="tab-content">
       <div class="chart-card">
@@ -395,6 +539,11 @@
             <label for="tradeNotes">Trade Notes / Setup Description:</label>
             <textarea id="tradeNotes" class="form-textarea" placeholder="Key takeaways, chart patterns, catalyst, or reasons for trade..."></textarea>
           </div>
+
+          <div class="form-group full">
+            <label for="tradeChartUrl">Chart Snapshot Image URL (Optional):</label>
+            <input type="url" id="tradeChartUrl" class="form-input" placeholder="https://images.unsplash.com/... or TradingView snapshot link" />
+          </div>
         </div>
 
         <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
@@ -403,6 +552,33 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <!-- Authentication Modal -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <div class="modal-title">🔐 Trader Portal Authentication</div>
+        <button id="closeAuthModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="authForm" class="modal-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Email Address:</label>
+          <input type="email" id="authEmail" class="form-input" value="ankit@tradepulse.ai" required />
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Password:</label>
+          <input type="password" id="authPass" class="form-input" value="••••••••" required />
+        </div>
+        <button type="submit" class="btn-add-trade" style="width:100%; justify-content:center; margin-bottom:12px;">Login to Account</button>
+        <button type="button" id="btnQuickDemoLogin" class="form-input" style="width:100%; cursor:pointer; background:rgba(6,182,212,0.15); border-color:var(--cyan-accent); color:var(--cyan-accent); font-weight:700;">⚡ 1-Click Quick Demo Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal for Chart Snapshots -->
+  <div id="lightboxModal" class="lightbox-modal">
+    <img id="lightboxImg" class="lightbox-img" src="" alt="Chart Snapshot" />
   </div>
 
   <!-- JavaScript App Logic -->
