@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradePulse AI – Trading Journal & Analytics Dashboard</title>
+
+  <!-- Plotly.js CDN -->
+  <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Marquee Ticker Bar -->
+  <div class="ticker-marquee">
+    <div class="marquee-content">
+      <span class="marquee-item">AAPL: <span class="text-green">$185.40 (+1.2%)</span></span>
+      <span class="marquee-item">MSFT: <span class="text-green">$422.10 (+0.8%)</span></span>
+      <span class="marquee-item">NVDA: <span class="text-green">$128.50 (+3.4%)</span></span>
+      <span class="marquee-item">TSLA: <span class="text-red">$224.80 (-1.5%)</span></span>
+      <span class="marquee-item">META: <span class="text-green">$512.30 (+2.4%)</span></span>
+      <span class="marquee-item">AMZN: <span class="text-green">$186.70 (+1.1%)</span></span>
+      <span class="marquee-item">NFLX: <span class="text-green">$654.20 (+1.9%)</span></span>
+      <span class="marquee-item">AMD: <span class="text-red">$149.80 (-0.7%)</span></span>
+      <span class="marquee-item">JPM: <span class="text-green">$211.50 (+0.5%)</span></span>
+      <span class="marquee-item">BTC-USD: <span class="text-green">$64,250 (+2.1%)</span></span>
+      <span class="marquee-item">ETH-USD: <span class="text-green">$3,420 (+1.8%)</span></span>
+      <span class="marquee-item">RELIANCE: <span class="text-green">₹3,015 (+1.4%)</span></span>
+      <span class="marquee-item">NIFTY 50: <span class="text-green">25,350 (+0.6%)</span></span>
+      <span class="marquee-item">BANKNIFTY: <span class="text-green">51,800 (+0.9%)</span></span>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    
+    <!-- Navbar Header -->
+    <header class="navbar">
+      <div class="brand">
+        <a href="index.html" style="text-decoration:none; display:flex; align-items:center; gap:14px;">
+          <div class="brand-icon">⚡</div>
+          <div class="brand-text">
+            <h1>TradePulse AI</h1>
+            <p>Smart AI-Powered Trading Journal & Performance Analytics Platform</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="user-profile-bar">
+        <a href="index.html" class="btn-hero-secondary" style="padding: 8px 16px; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+          <span>🏠 Home Page</span>
+        </a>
+
+        <div class="profile-pill" id="userProfilePill">
+          <div class="avatar-badge" id="avatarBadge">AM</div>
+          <div class="profile-info">
+            <div class="profile-name" id="userName">Ankit Mishra <span class="badge-pro">PRO</span></div>
+            <select id="activeAccountSelect" class="account-selector">
+              <option value="Personal">💼 Personal Portfolio ($25K)</option>
+              <option value="PropFirm">🏦 Prop Firm Account ($100K)</option>
+              <option value="Paper">🧪 Paper Trading Sandbox</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="openAuthModalBtn" class="form-input" style="cursor:pointer; font-weight:600;">🔐 Login</button>
+
+        <button id="openTradeModalBtn" class="btn-add-trade">
+          <span>+ Log New Trade</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Risk Protocol Breach Alert Banner (Hidden by Default) -->
+    <div id="riskGuardBanner" class="risk-alert-banner" style="display: none;">
+      <div class="risk-alert-title">
+        <span>🚨 RISK PROTOCOL WARNING:</span>
+        <span id="riskAlertMsg">Daily Max Loss Threshold ($1,000) Breached! Stop trading immediately to preserve capital.</span>
+      </div>
+      <button onclick="dismissRiskAlert()" class="form-input" style="cursor:pointer; font-size:12px; background:rgba(244,63,94,0.3); border-color:#f43f5e; color:#fff;">Acknowledge</button>
+    </div>
+
+    <!-- KPI Metric Cards Ribbon -->
+    <div class="kpi-grid">
+      <div class="kpi-card green" id="kpiNetPnlCard">
+        <div class="kpi-title">Net Realized P&L</div>
+        <div class="kpi-value text-green" id="kpiNetPnl">+$0.00</div>
+        <div class="kpi-subtext text-green" id="kpiNetPnlPct">+0.00% Account Growth</div>
+      </div>
+
+      <div class="kpi-card blue">
+        <div class="kpi-title">Overall Win Rate</div>
+        <div class="kpi-value" id="kpiWinRate">0.0%</div>
+        <div class="kpi-subtext text-cyan" id="kpiWinCount">0 Wins / 0 Losses</div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-title">Profit Factor</div>
+        <div class="kpi-value" id="kpiProfitFactor">0.00</div>
+        <div class="kpi-subtext text-muted">Gross Profit / Gross Loss</div>
+      </div>
+
+      <div class="kpi-card yellow">
+        <div class="kpi-title">Total Trades Logged</div>
+        <div class="kpi-value" id="kpiTotalTrades">0</div>
+        <div class="kpi-subtext text-muted" id="kpiAvgTradePnl">Avg P&L: $0.00</div>
+      </div>
+
+      <div class="kpi-card green">
+        <div class="kpi-title">Avg Win / Avg Loss</div>
+        <div class="kpi-value" id="kpiWinLossRatio">0.00</div>
+        <div class="kpi-subtext text-green" id="kpiExpectancy">Expectancy: +$0.00</div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-header">
+      <button class="tab-btn active" data-tab="tab1">📖 Trade Journal & Log</button>
+      <button class="tab-btn" data-tab="tab2">📅 Monthly P&L Calendar</button>
+      <button class="tab-btn" data-tab="tab3">🤖 AI Coach & Behavioral Insights</button>
+      <button class="tab-btn" data-tab="tab4">📈 Performance & Equity Curve</button>
+      <button class="tab-btn" data-tab="tab5">📊 Technical Market Charting</button>
+      <button class="tab-btn" data-tab="tab7">🛡️ Risk Guard & Position Size Calculator</button>
+      <button class="tab-btn" data-tab="tab8">📚 Execution Strategy Playbook</button>
+      <button class="tab-btn" data-tab="tab9">📰 Economic News & Macro Calendar</button>
+      <button class="tab-btn" data-tab="tab6">💾 Data Backup & CSV Export</button>
+    </div>
+
+    <!-- Tab 1: Trade Journal & Log -->
+    <div id="tab1" class="tab-content active">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Trading History & Execution Log</div>
+          <div style="display: flex; gap: 10px;">
+            <select id="filterStrategy" class="form-select" style="padding: 6px 12px; font-size: 12px;">
+              <option value="ALL">All Strategies</option>
+              <option value="Breakout">Breakout</option>
+              <option value="Reversal">Reversal</option>
+              <option value="Momentum">Momentum</option>
+              <option value="Scalp">Scalp</option>
+            </select>
+            <select id="filterEmotion" class="form-select" style="padding: 6px 12px; font-size: 12px;">
+              <option value="ALL">All Mindsets</option>
+              <option value="Disciplined">Disciplined</option>
+              <option value="FOMO">FOMO</option>
+              <option value="Revenge">Revenge</option>
+              <option value="Greed">Greed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Ticker</th>
+                <th>Side</th>
+                <th>Type</th>
+                <th>Entry ($)</th>
+                <th>Exit ($)</th>
+                <th>Qty</th>
+                <th>P&L ($)</th>
+                <th>Strategy</th>
+                <th>Emotion</th>
+                <th>Mistake</th>
+                <th>Rating</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="journalTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Monthly P&L Calendar -->
+    <div id="tab2" class="tab-content">
+      <div class="chart-card">
+        <div class="calendar-controls">
+          <div class="chart-title" id="calendarMonthTitle">P&L Calendar Heatmap</div>
+          <div style="display:flex; gap:8px;">
+            <button id="prevMonthBtn" class="form-input" style="cursor:pointer;">&lt; Prev</button>
+            <button id="nextMonthBtn" class="form-input" style="cursor:pointer;">Next &gt;</button>
+          </div>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: AI Coach & Behavioral Insights -->
+    <div id="tab3" class="tab-content">
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">🤖 AI Performance Coach Diagnosis</div>
+          </div>
+          <div id="aiInsightsContainer"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Trading Mistakes Dollar Cost Breakdown</div>
+          </div>
+          <div id="mistakesPlot" class="plot-container" style="min-height: 360px;"></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Psychology & Emotional Mindset Impact on P&L</div>
+        </div>
+        <div id="emotionPlot" class="plot-container" style="min-height: 380px;"></div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Performance Analytics & Equity Curve -->
+    <div id="tab4" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Cumulative Account Equity Curve ($)</div>
+        </div>
+        <div id="equityPlot" class="plot-container"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Strategy P&L Breakdown</div>
+          </div>
+          <div id="strategyPnlPlot" class="plot-container" style="min-height: 360px;"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Risk & Statistical Performance Metrics</div>
+          </div>
+          <div style="padding: 10px 0;">
+            <table>
+              <tbody>
+                <tr><td>Sharpe Ratio (Rf=2%)</td><td id="statSharpe" style="font-weight:700; color:#38bdf8;">-</td></tr>
+                <tr><td>Sortino Ratio</td><td id="statSortino" style="font-weight:700; color:#10b981;">-</td></tr>
+                <tr><td>Max Drawdown</td><td id="statMaxDD" style="font-weight:700; color:#f43f5e;">-</td></tr>
+                <tr><td>Value at Risk (VaR 95%)</td><td id="statVaR" style="font-weight:700; color:#f43f5e;">-</td></tr>
+                <tr><td>Best Trade ($)</td><td id="statBestTrade" style="font-weight:700; color:#10b981;">-</td></tr>
+                <tr><td>Worst Trade ($)</td><td id="statWorstTrade" style="font-weight:700; color:#f43f5e;">-</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Technical Market Charting -->
+    <div id="tab5" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="chart-title">Live Technical Market Analysis</div>
+            <select id="techTickerSelect" class="select-input">
+              <optgroup label="🇺🇸 US Tech & Growth">
+                <option value="AAPL">AAPL - Apple Inc.</option>
+                <option value="MSFT">MSFT - Microsoft</option>
+                <option value="NVDA">NVDA - NVIDIA</option>
+                <option value="TSLA">TSLA - Tesla</option>
+                <option value="GOOGL">GOOGL - Alphabet (Google)</option>
+                <option value="AMZN">AMZN - Amazon.com</option>
+                <option value="META">META - Meta Platforms</option>
+                <option value="NFLX">NFLX - Netflix</option>
+                <option value="AMD">AMD - Advanced Micro Devices</option>
+                <option value="INTC">INTC - Intel Corporation</option>
+              </optgroup>
+              <optgroup label="🏦 Blue Chips & Finance">
+                <option value="JPM">JPM - JPMorgan Chase</option>
+                <option value="V">V - Visa Inc.</option>
+                <option value="DIS">DIS - Walt Disney</option>
+              </optgroup>
+              <optgroup label="🪙 Crypto Currency">
+                <option value="BTC-USD">BTC-USD - Bitcoin</option>
+                <option value="ETH-USD">ETH-USD - Ethereum</option>
+                <option value="SOL-USD">SOL-USD - Solana</option>
+              </optgroup>
+              <optgroup label="🇮🇳 Indian Equities & Indices">
+                <option value="RELIANCE.NS">RELIANCE.NS - Reliance Industries</option>
+                <option value="TCS.NS">TCS.NS - Tata Consultancy Services</option>
+                <option value="INFY">INFY - Infosys</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div id="techPricePlot" class="plot-container"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">RSI Momentum (14)</div></div>
+          <div id="techRsiPlot" class="plot-container" style="min-height: 320px;"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header"><div class="chart-title">MACD (12, 26, 9)</div></div>
+          <div id="techMacdPlot" class="plot-container" style="min-height: 320px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 7: Risk Guard & Position Size Calculator -->
+    <div id="tab7" class="tab-content">
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">📐 Smart Position Sizing & Risk Calculator</div>
+          </div>
+          <form id="posCalcForm" class="calc-card">
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Account Balance ($):</label>
+              <input type="number" id="calcAccount" class="form-input" value="25000" required />
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Risk Per Trade (%):</label>
+              <input type="number" step="0.1" id="calcRiskPct" class="form-input" value="1.0" required />
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Entry Price ($):</label>
+              <input type="number" step="0.01" id="calcEntry" class="form-input" placeholder="e.g. 185.00" required />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Stop Loss Price ($):</label>
+              <input type="number" step="0.01" id="calcStop" class="form-input" placeholder="e.g. 182.50" required />
+            </div>
+            <button type="button" id="btnCalculatePos" class="btn-add-trade" style="width:100%; justify-content:center;">Calculate Position Size</button>
+          </form>
+
+          <div class="calc-result-box" id="calcResultBox">
+            <div style="font-size:12px; font-weight:600; color:var(--text-muted);">RECOMMENDED SHARES / CONTRACTS</div>
+            <div class="calc-result-val" id="calcResultQty">0 Shares</div>
+            <div style="font-size:13px; color:var(--text-main); margin-top:4px;" id="calcResultDollar">Dollar Risk: $250.00 (1.0%)</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">🛡️ Daily Risk Guard Protocol Settings</div>
+          </div>
+          <div style="padding:10px 0;">
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">
+              Protect your capital by setting strict maximum daily loss thresholds. The system triggers an immediate protocol warning if exceeded.
+            </p>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Daily Max Loss Limit ($):</label>
+              <input type="number" id="settingMaxLoss" class="form-input" value="1000" />
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label>Max Consecutive Loss Streak Allowable:</label>
+              <input type="number" id="settingMaxStreak" class="form-input" value="3" />
+            </div>
+            <button id="saveRiskSettingsBtn" class="btn-add-trade">Save Risk Protocol Rules</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 8: Strategy Playbook & Execution Rules -->
+    <div id="tab8" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📚 Pre-Trade Execution Playbook Checklist</div>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+          Enforce discipline by verifying setup criteria before taking any live order entry.
+        </p>
+
+        <div class="playbook-item">
+          <input type="checkbox" id="pb1" class="playbook-checkbox">
+          <label for="pb1" style="cursor:pointer; color:var(--text-main);">1. Higher Timeframe Alignment: 4H & Daily trend direction confirmed.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb2" class="playbook-checkbox">
+          <label for="pb2" style="cursor:pointer; color:var(--text-main);">2. Key Level Rejection / Breakout: Clear horizontal support/resistance test.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb3" class="playbook-checkbox">
+          <label for="pb3" style="cursor:pointer; color:var(--text-main);">3. Volume Confirmation: Relative volume spike above 20-period average.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb4" class="playbook-checkbox">
+          <label for="pb4" style="cursor:pointer; color:var(--text-main);">4. Risk:Reward Ratio Check: Planned profit target is at least 2x stop loss distance.</label>
+        </div>
+        <div class="playbook-item">
+          <input type="checkbox" id="pb5" class="playbook-checkbox">
+          <label for="pb5" style="cursor:pointer; color:var(--text-main);">5. Emotional State Check: Calm, focused, and free from FOMO or revenge mindset.</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 9: Economic News & Macro Calendar -->
+    <div id="tab9" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📰 High-Impact Macro Economic Events & Catalyst Feed</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Currency / Country</th>
+              <th>Event Catalyst</th>
+              <th>Impact Tier</th>
+              <th>Forecast</th>
+              <th>Prior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>08:30 EST</td><td>🇺🇸 USD</td><td>Core Inflation CPI (MoM)</td><td><span class="tag-pill tag-fomo">HIGH IMPACT</span></td><td>0.3%</td><td>0.2%</td></tr>
+            <tr><td>14:00 EST</td><td>🇺🇸 USD</td><td>FOMC Federal Reserve Rate Decision</td><td><span class="tag-pill tag-revenge">CRITICAL</span></td><td>5.25%</td><td>5.50%</td></tr>
+            <tr><td>04:30 EST</td><td>🇪🇺 EUR</td><td>ECB Monetary Policy Statement</td><td><span class="tag-pill tag-fomo">HIGH IMPACT</span></td><td>3.75%</td><td>3.75%</td></tr>
+            <tr><td>09:30 EST</td><td>🇮🇳 INR</td><td>RBI Benchmark Repo Rate Announcement</td><td><span class="tag-pill tag-breakout">MEDIUM</span></td><td>6.50%</td><td>6.50%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 6: Backup & Export -->
+    <div id="tab6" class="tab-content">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Trade Journal Backup & CSV Export</div>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">
+          Export your complete trading journal data as a standard CSV spreadsheet or JSON backup file.
+        </p>
+        <div style="display: flex; gap: 16px;">
+          <button id="exportCsvBtn" class="btn-add-trade">📥 Export Journal to CSV</button>
+          <button id="resetJournalBtn" class="btn-add-trade" style="background: linear-gradient(135deg, var(--red-accent), var(--yellow-accent));">🔄 Reset to Sample Data</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Trade Log Modal -->
+  <div id="tradeModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">+ Log New Trade</div>
+        <button id="closeModalBtn" class="close-btn">&times;</button>
+      </div>
+
+      <form id="tradeForm" class="modal-body">
+        <input type="hidden" id="tradeId" />
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tradeDate">Date:</label>
+            <input type="date" id="tradeDate" class="form-input" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeSymbol">Ticker / Symbol:</label>
+            <input type="text" id="tradeSymbol" class="form-input" placeholder="e.g. AAPL, NVDA, NIFTY" required style="text-transform: uppercase;" />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeSide">Side:</label>
+            <select id="tradeSide" class="form-select">
+              <option value="BUY">BUY / LONG</option>
+              <option value="SELL">SELL / SHORT</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeAsset">Asset Class:</label>
+            <select id="tradeAsset" class="form-select">
+              <option value="Stock">Equity / Stock</option>
+              <option value="Options">Options</option>
+              <option value="Futures">Futures</option>
+              <option value="Crypto">Crypto</option>
+              <option value="Forex">Forex</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeEntry">Entry Price ($):</label>
+            <input type="number" step="0.01" id="tradeEntry" class="form-input" placeholder="0.00" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeExit">Exit Price ($):</label>
+            <input type="number" step="0.01" id="tradeExit" class="form-input" placeholder="0.00" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeQty">Quantity / Shares:</label>
+            <input type="number" step="1" id="tradeQty" class="form-input" placeholder="100" required />
+          </div>
+
+          <div class="form-group">
+            <label for="tradeStrategy">Strategy Setup:</label>
+            <select id="tradeStrategy" class="form-select">
+              <option value="Breakout">Breakout</option>
+              <option value="Reversal">Reversal</option>
+              <option value="Momentum">Momentum</option>
+              <option value="Scalp">Scalp</option>
+              <option value="Trend Following">Trend Following</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeEmotion">Mindset / Emotion:</label>
+            <select id="tradeEmotion" class="form-select">
+              <option value="Disciplined">Disciplined (Planned)</option>
+              <option value="FOMO">FOMO (Chasing)</option>
+              <option value="Revenge">Revenge Trade</option>
+              <option value="Greed">Greed (Over-held)</option>
+              <option value="Fear">Fear (Panic Exit)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="tradeMistake">Execution Mistake:</label>
+            <select id="tradeMistake" class="form-select">
+              <option value="None">None (Flawless Execution)</option>
+              <option value="Chasing Price">Chasing Price</option>
+              <option value="Early Exit">Early Exit</option>
+              <option value="Over-leveraged">Over-leveraged</option>
+              <option value="No Stop Loss">No Stop Loss</option>
+              <option value="Moved Stop Loss">Moved Stop Loss</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="tradeRating">Execution Quality Rating:</label>
+            <select id="tradeRating" class="form-select">
+              <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Perfect)</option>
+              <option value="4">⭐⭐⭐⭐ 4 Stars (Good)</option>
+              <option value="3">⭐⭐⭐ 3 Stars (Average)</option>
+              <option value="2">⭐⭐ 2 Stars (Flawed)</option>
+              <option value="1">⭐ 1 Star (Terrible)</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label for="tradeNotes">Trade Notes / Setup Description:</label>
+            <textarea id="tradeNotes" class="form-textarea" placeholder="Key takeaways, chart patterns, catalyst, or reasons for trade..."></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label for="tradeChartUrl">Chart Snapshot Image URL (Optional):</label>
+            <input type="url" id="tradeChartUrl" class="form-input" placeholder="https://images.unsplash.com/... or TradingView snapshot link" />
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" id="cancelModalBtn" class="form-input" style="cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn-add-trade">Save Trade Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Authentication Modal -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <div class="modal-title">🔐 Trader Portal Authentication</div>
+        <button id="closeAuthModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="authForm" class="modal-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Email Address:</label>
+          <input type="email" id="authEmail" class="form-input" value="ankit@tradepulse.ai" required />
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Password:</label>
+          <input type="password" id="authPass" class="form-input" value="••••••••" required />
+        </div>
+        <button type="submit" class="btn-add-trade" style="width:100%; justify-content:center; margin-bottom:12px;">Login to Account</button>
+        <button type="button" id="btnQuickDemoLogin" class="form-input" style="width:100%; cursor:pointer; background:rgba(6,182,212,0.15); border-color:var(--cyan-accent); color:var(--cyan-accent); font-weight:700;">⚡ 1-Click Quick Demo Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal for Chart Snapshots -->
+  <div id="lightboxModal" class="lightbox-modal">
+    <img id="lightboxImg" class="lightbox-img" src="" alt="Chart Snapshot" />
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
