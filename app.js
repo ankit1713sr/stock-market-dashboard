@@ -192,14 +192,19 @@ function setupEventListeners() {
   document.getElementById('filterEmotion').addEventListener('change', renderJournalTable);
 
   // Calendar Controls
-  document.getElementById('prevMonthBtn').addEventListener('click', () => {
+  const handlePrevMonth = () => {
     currentCalDate.setMonth(currentCalDate.getMonth() - 1);
     renderCalendar();
-  });
-  document.getElementById('nextMonthBtn').addEventListener('click', () => {
+  };
+  const handleNextMonth = () => {
     currentCalDate.setMonth(currentCalDate.getMonth() + 1);
     renderCalendar();
-  });
+  };
+
+  if (document.getElementById('prevMonthBtn')) document.getElementById('prevMonthBtn').addEventListener('click', handlePrevMonth);
+  if (document.getElementById('nextMonthBtn')) document.getElementById('nextMonthBtn').addEventListener('click', handleNextMonth);
+  if (document.getElementById('overviewPrevMonthBtn')) document.getElementById('overviewPrevMonthBtn').addEventListener('click', handlePrevMonth);
+  if (document.getElementById('overviewNextMonthBtn')) document.getElementById('overviewNextMonthBtn').addEventListener('click', handleNextMonth);
 
   // Export & Reset Buttons
   document.getElementById('exportCsvBtn').addEventListener('click', exportJournalCSV);
@@ -339,25 +344,17 @@ function deleteTrade(id) {
 // Tab 2: Interactive Monthly P&L Calendar Grid
 // ----------------------------------------------------
 function renderCalendar() {
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '';
+  const targets = [
+    { grid: document.getElementById('calendarGrid'), title: document.getElementById('calendarMonthTitle') },
+    { grid: document.getElementById('overviewCalendarGrid'), title: document.getElementById('overviewCalendarMonthTitle') }
+  ];
 
   const year = currentCalDate.getFullYear();
   const month = currentCalDate.getMonth();
-
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  document.getElementById('calendarMonthTitle').innerHTML = `📅 P&L Calendar - ${monthNames[month]} ${year}`;
+  const titleText = `📅 Monthly P&L Performance Calendar - ${monthNames[month]} ${year}`;
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  daysOfWeek.forEach(d => {
-    const head = document.createElement('div');
-    head.className = 'cal-day-header';
-    head.innerHTML = d;
-    grid.appendChild(head);
-  });
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   // Map trades by date string YYYY-MM-DD
   const tradeMap = {};
@@ -366,46 +363,62 @@ function renderCalendar() {
     tradeMap[t.date].push(t);
   });
 
-  // Empty leading days
-  for (let i = 0; i < firstDay; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'cal-cell empty';
-    grid.appendChild(cell);
-  }
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Days of month
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dayTrades = tradeMap[dateStr] || [];
+  targets.forEach(({ grid, title }) => {
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (title) title.innerHTML = titleText;
 
-    let dayPnl = 0;
-    dayTrades.forEach(t => dayPnl += t.pnl);
+    daysOfWeek.forEach(d => {
+      const head = document.createElement('div');
+      head.className = 'cal-day-header';
+      head.innerHTML = d;
+      grid.appendChild(head);
+    });
 
-    const cell = document.createElement('div');
-    let cellClass = 'cal-cell';
-    if (dayTrades.length > 0) {
-      cellClass += dayPnl >= 0 ? ' profit' : ' loss';
+    // Empty leading days
+    for (let i = 0; i < firstDay; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell empty';
+      grid.appendChild(cell);
     }
 
-    cell.className = cellClass;
-    cell.innerHTML = `
-      <div class="cal-date-num">${day}</div>
-      ${dayTrades.length > 0 ? `
-        <div class="cal-pnl-val ${dayPnl >= 0 ? 'text-green' : 'text-red'}">
-          ${dayPnl >= 0 ? '+' : ''}$${dayPnl.toFixed(0)}
-        </div>
-        <div class="cal-trades-cnt">${dayTrades.length} Trade${dayTrades.length > 1 ? 's' : ''}</div>
-      ` : ''}
-    `;
+    // Days of month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const dayTrades = tradeMap[dateStr] || [];
 
-    if (dayTrades.length > 0) {
-      cell.addEventListener('click', () => {
-        alert(`Trades on ${dateStr}:\n` + dayTrades.map(t => `${t.side} ${t.symbol} | P&L: $${t.pnl} | Strategy: ${t.strategy}`).join('\n'));
-      });
+      let dayPnl = 0;
+      dayTrades.forEach(t => dayPnl += t.pnl);
+
+      const cell = document.createElement('div');
+      let cellClass = 'cal-cell';
+      if (dayTrades.length > 0) {
+        cellClass += dayPnl >= 0 ? ' profit' : ' loss';
+      }
+
+      cell.className = cellClass;
+      cell.innerHTML = `
+        <div class="cal-date-num">${day}</div>
+        ${dayTrades.length > 0 ? `
+          <div class="cal-pnl-val ${dayPnl >= 0 ? 'text-green' : 'text-red'}">
+            ${dayPnl >= 0 ? '+' : ''}$${dayPnl.toFixed(0)}
+          </div>
+          <div class="cal-trades-cnt">${dayTrades.length} Trade${dayTrades.length > 1 ? 's' : ''}</div>
+        ` : ''}
+      `;
+
+      if (dayTrades.length > 0) {
+        cell.addEventListener('click', () => {
+          alert(`Trades on ${dateStr}:\n` + dayTrades.map(t => `${t.side} ${t.symbol} | P&L: $${t.pnl} | Strategy: ${t.strategy}`).join('\n'));
+        });
+      }
+
+      grid.appendChild(cell);
     }
-
-    grid.appendChild(cell);
-  }
+  });
 }
 
 // ----------------------------------------------------

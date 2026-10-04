@@ -129,6 +129,18 @@
 
     <!-- Tab 1: Trade Journal & Log -->
     <div id="tab1" class="tab-content active">
+      <!-- Interactive Monthly P&L Performance Calendar -->
+      <div class="chart-card">
+        <div class="calendar-controls">
+          <div class="chart-title" id="overviewCalendarMonthTitle">📅 Monthly P&L Performance Calendar</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="overviewPrevMonthBtn" class="form-input" style="cursor:pointer;">&lt; Prev</button>
+            <button id="overviewNextMonthBtn" class="form-input" style="cursor:pointer;">Next &gt;</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="overviewCalendarGrid"></div>
+      </div>
+
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-title">Trading History & Execution Log</div>
