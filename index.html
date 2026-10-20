@@ -10,7 +10,7 @@
 
   <div class="ticker-marquee">
     <div class="marquee-content">
-      <span class="ticker-live-badge"><span class="live-dot"></span> LIVE MARKET SNAPSHOT</span>
+      <span class="ticker-live-badge"><span class="live-dot"></span> ILLUSTRATIVE QUOTES — NOT LIVE</span>
       <span class="marquee-item"><span class="marquee-symbol">AAPL</span> <span class="text-green">$185.40 +1.2%</span></span>
       <span class="marquee-item"><span class="marquee-symbol">MSFT</span> <span class="text-green">$422.10 +0.8%</span></span>
       <span class="marquee-item"><span class="marquee-symbol">NVDA</span> <span class="text-green">$128.50 +3.4%</span></span>
@@ -44,7 +44,7 @@
       <div class="home-hero-content reveal-on-load">
         <div class="home-eyebrow">
           <span class="live-dot"></span>
-          FastAPI-powered trading journal and analytics engine
+          Trading journal and analytics · optional Python API
         </div>
         <h1 id="hero-title">TradePulse AI</h1>
         <p class="home-hero-copy">
@@ -55,16 +55,16 @@
           <a href="#features" class="home-secondary-action">Explore Features</a>
         </div>
         <div class="home-hero-meta" aria-label="Platform highlights">
-          <span>SQLite persistence</span>
+          <span>Offline cache / optional API persistence</span>
           <span>Python analytics</span>
           <span>Vanilla JavaScript UI</span>
         </div>
       </div>
 
-      <aside class="home-floating-panel reveal-on-load" aria-label="Trading performance preview">
+      <aside class="home-floating-panel reveal-on-load" aria-label="Fictional performance illustration, not your account">
         <div class="home-panel-header">
-          <span>Today</span>
-          <strong class="text-green">Risk Within Limits</strong>
+          <span>Fictional example · not your account</span>
+          <strong class="text-green">Illustrative results</strong>
         </div>
         <div class="home-panel-value text-green">+$14,250</div>
         <div class="home-mini-chart" aria-hidden="true">
@@ -85,23 +85,11 @@
       </aside>
     </section>
 
-    <section class="home-stats reveal-section" aria-label="TradePulse AI platform metrics">
-      <div>
-        <strong data-count="1500000">0</strong>
-        <span>Trades analyzed</span>
-      </div>
-      <div>
-        <strong data-count="68">0</strong>
-        <span>Less emotion-driven leakage</span>
-      </div>
-      <div>
-        <strong data-count="18500">0</strong>
-        <span>Global active traders</span>
-      </div>
-      <div>
-        <strong data-count="7">0</strong>
-        <span>Roadmap phases integrated</span>
-      </div>
+    <section class="home-stats reveal-section" aria-label="TradePulse AI capabilities">
+      <div><strong>Journal</strong><span>Entries, exits, and execution notes</span></div>
+      <div><strong>Risk</strong><span>Position sizing and review tools</span></div>
+      <div><strong>Analytics</strong><span>Calendar and strategy breakdowns</span></div>
+      <div><strong>Offline</strong><span>Local cache; optional Python API</span></div>
     </section>
 
     <section id="features" class="home-section reveal-section">
@@ -120,7 +108,7 @@
         <article class="home-feature-card">
           <span class="home-card-index">02</span>
           <h3>Python P&amp;L Math</h3>
-          <p>P&amp;L, percentage return, risk amount, and R-multiple are calculated in the FastAPI service layer instead of the browser.</p>
+          <p>When connected, the Python API validates costs and calculates P&amp;L, return, risk, and R-multiple. Offline mode uses local calculations with disclosed limitations.</p>
         </article>
         <article class="home-feature-card">
           <span class="home-card-index">03</span>
@@ -150,7 +138,7 @@
         <article>
           <b>02</b>
           <h3>Let the API calculate</h3>
-          <p>FastAPI validates the payload, SQLAlchemy persists the record, and Python services compute the financial metrics.</p>
+          <p>With a configured backend, FastAPI validates and persists records and Python computes the metrics. Otherwise, records stay in this browser.</p>
         </article>
         <article>
           <b>03</b>
@@ -163,8 +151,8 @@
     <section id="analytics" class="home-section home-analytics-band reveal-section">
       <div>
         <span class="home-section-kicker">Quant Workspace</span>
-        <h2>Every major trading view is connected to the same source of truth.</h2>
-        <p>The browser stays focused on rendering and interaction. FastAPI handles routes and orchestration. Python services handle calculations. SQLite keeps journal history local and durable.</p>
+        <h2>One workspace for trading review and cost-aware analytics.</h2>
+        <p>This static frontend runs independently. A separately hosted Python API enables validated accounting and database persistence. Without it, the workspace shows clearly labeled local-cache or fictional demo data.</p>
       </div>
       <div class="home-analytics-list">
         <span>CRUD-backed journal</span>
@@ -194,7 +182,7 @@
           <tbody>
             <tr>
               <td>Trade calculations</td>
-              <td>Python services calculate P&amp;L, return, risk, and R-multiple</td>
+              <td>Python calculations when connected; disclosed local fallback offline</td>
               <td>Manual formulas that drift over time</td>
             </tr>
             <tr>
@@ -219,18 +207,18 @@
 
     <section id="testimonials" class="home-section reveal-section">
       <div class="home-section-head">
-        <span>Trader Feedback</span>
+        <span>Illustrative Review Prompts</span>
         <h2>Designed for serious review sessions.</h2>
       </div>
 
       <div class="home-testimonial-grid">
         <article class="home-quote-card">
-          <p>"The journal view makes my setup quality obvious. I can see when discipline is making money and when emotion is taxing the account."</p>
-          <strong>Intraday Options Trader</strong>
+          <p>"Which setups followed my plan, and which trades were driven by emotion?"</p>
+          <strong>Execution review prompt</strong>
         </article>
         <article class="home-quote-card">
-          <p>"The risk calculator and performance views are exactly what I need before a prop evaluation session. Clean, fast, and direct."</p>
-          <strong>Funded Account Trader</strong>
+          <p>"What is my planned risk, and what can I learn from the last trading session?"</p>
+          <strong>Risk review prompt</strong>
         </article>
       </div>
     </section>
@@ -264,36 +252,6 @@
       revealObserver.observe(section);
     });
 
-    const statObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.querySelectorAll('[data-count]').forEach((item) => {
-          const target = Number(item.dataset.count);
-          const duration = 900;
-          const start = performance.now();
-
-          function tick(now) {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const value = Math.round(target * eased);
-            item.textContent = target >= 1000000
-              ? `${(value / 1000000).toFixed(1)}M+`
-              : target >= 1000
-                ? `${value.toLocaleString()}+`
-                : target === 68
-                  ? `-${value}%`
-                  : value.toString();
-            if (progress < 1) requestAnimationFrame(tick);
-          }
-
-          requestAnimationFrame(tick);
-        });
-        statObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.45 });
-
-    const stats = document.querySelector('.home-stats');
-    if (stats) statObserver.observe(stats);
   </script>
 </body>
 </html>

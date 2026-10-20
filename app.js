@@ -6,6 +6,21 @@ let trades = [];
 let useApiBackend = false;
 let currentCalDate = new Date();
 
+window.addEventListener('tradepulse:api-unavailable', () => {
+  useApiBackend = false;
+  updateConnectionStatus(false);
+});
+
+function showChartSource(id, market) {
+  const node = document.getElementById(id);
+  if (!node) return;
+  // The existing API may silently synthesize candles. Do not certify provenance.
+  node.innerText = market
+    ? 'API chart data — source unverified; may be simulated or delayed. Not real-time.'
+    : 'SIMULATED illustration — generated prices/indicators, not market observations.';
+}
+
+
 function getStorageKey() {
   return `tradepulse_journal_v1_${activeAccount}`;
 }
@@ -111,11 +126,16 @@ function updateConnectionStatus(connected, count, latency) {
   if (connected) {
     if (dot) dot.style.background = '#10b981';
     text.innerText = count !== undefined ? `API CONNECTED (${count} Trades)` : 'API CONNECTED';
-    if (latEl) latEl.innerText = latency ? `${latency}ms` : '12ms';
+    if (latEl) latEl.innerText = Number.isFinite(latency) ? `${latency}ms` : '—';
   } else {
     if (dot) dot.style.background = '#f59e0b';
     text.innerText = 'OFFLINE (LOCAL CACHE)';
     if (latEl) latEl.innerText = 'LOCAL';
+  }
+  const notice = document.getElementById('connectionNotice');
+  if (notice) {
+    notice.style.display = connected ? 'none' : 'flex';
+    notice.innerText = 'OFFLINE — local browser cache only. No server persistence; fictional examples are labeled DEMO.';
   }
 }
 
@@ -309,15 +329,15 @@ function setupEventListeners() {
   document.getElementById('openAuthModalBtn').addEventListener('click', () => { authModal.style.display = 'flex'; });
   document.getElementById('closeAuthModalBtn').addEventListener('click', () => { authModal.style.display = 'none'; });
   document.getElementById('btnQuickDemoLogin').addEventListener('click', () => {
-    document.getElementById('userName').innerHTML = 'Ankit Mishra <span class="badge-pro">PRO</span>';
-    document.getElementById('avatarBadge').innerText = 'AM';
+    document.getElementById('userName').innerHTML = 'Demo Trader <span class="badge-pro">DEMO</span>';
+    document.getElementById('avatarBadge').innerText = 'DT';
     authModal.style.display = 'none';
   });
   document.getElementById('authForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('authEmail').value;
     const name = email.split('@')[0];
-    document.getElementById('userName').innerHTML = `${name} <span class="badge-pro">PRO</span>`;
+    document.getElementById('userName').innerHTML = `${name} <span class="badge-pro">DEMO</span>`;
     document.getElementById('avatarBadge').innerText = name.slice(0, 2).toUpperCase();
     authModal.style.display = 'none';
   });
@@ -658,12 +678,14 @@ async function openTradeDetail(id) {
     try {
       const market = await api.getMarketData(trade.symbol);
       candles = market.candles || [];
+      showChartSource('tradeDetailDataNotice', market);
     } catch (err) {
       console.warn('Trade detail market API failed; using generated local candles.', err);
     }
   }
 
   if (candles.length === 0) {
+    showChartSource('tradeDetailDataNotice', null);
     let price = trade.entry || 100;
     for (let i = 45; i >= 0; i--) {
       const d = new Date(trade.date);
@@ -1312,6 +1334,7 @@ async function renderTechnicalPlots(symbol) {
       const market = await api.getMarketData(symbol);
       const candles = market.candles || [];
       if (candles.length > 0) {
+        showChartSource('marketDataNotice', market);
         const dates = candles.map(c => c.date);
         const closes = candles.map(c => c.close);
 
@@ -1382,6 +1405,7 @@ async function renderTechnicalPlots(symbol) {
     }
   }
 
+  showChartSource('marketDataNotice', null);
   const dates = [];
   const opens = [], highs = [], lows = [], closes = [], volumes = [];
 

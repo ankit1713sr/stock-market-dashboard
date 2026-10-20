@@ -5,12 +5,26 @@
  * Compatible with standard <script> tags as well as ES Module imports.
  */
 
-const API_BASE = "http://127.0.0.1:8000";
+function configuredApiBase() {
+  const value = typeof window !== 'undefined' ? window.TRADEPULSE_CONFIG?.apiBaseUrl : '';
+  if (!value) return '';
+  const url = new URL(value);
+  const localHosts = ['localhost', '127.0.0.1', '[::1]'];
+  const localPage = typeof window !== 'undefined' && localHosts.includes(window.location?.hostname);
+  if (url.username || url.password || url.search || url.hash ||
+      (url.protocol !== 'https:' && !(localPage && localHosts.includes(url.hostname) && url.protocol === 'http:')) ||
+      (!localPage && localHosts.includes(url.hostname))) {
+    throw new Error('Invalid public API address; use HTTPS without credentials or query parameters.');
+  }
+  return url.href.replace(/\/$/, '');
+}
+const API_BASE = configuredApiBase();
 
 /**
  * Core fetch helper with timeout and clear error messaging.
  */
 async function apiFetch(path, options = {}) {
+  if (!API_BASE) throw new Error('API not configured; offline/local-cache mode.');
   const url = `${API_BASE}${path}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), options.timeout || 6000);
@@ -30,13 +44,18 @@ async function apiFetch(path, options = {}) {
         const err = await response.json();
         msg = err.detail || msg;
       } catch (_) { /* non-JSON body */ }
-      throw new Error(msg);
+      const error = new Error(msg);
+      error.status = response.status;
+      throw error;
     }
 
     if (response.status === 204) return null;
     return response.json();
   } catch (err) {
     clearTimeout(timeoutId);
+    if ((!err.status || err.status >= 500) && typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new Event('tradepulse:api-unavailable'));
+    }
     throw err;
   }
 }

@@ -50,8 +50,10 @@ In a separate terminal, serve the existing frontend locally:
 & $python -m http.server 5500 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:5500/` or `/dashboard.html`. The existing API client uses
-`http://127.0.0.1:8000`. Cached fallback examples are fictional and visibly
+Open `http://127.0.0.1:5500/` or `/dashboard.html`. The API client defaults to offline mode. For local API testing only, set
+`apiBaseUrl: "http://127.0.0.1:8000"` in `frontend/config.js` before serving
+the source checkout. Restore the empty address before publishing. Static builds
+generate configuration separately; see [static deployment](static-deployment.md). Cached fallback examples are fictional and visibly
 marked as demo data. Accounting entry remains an API feature; the existing
 frontend form/layout is preserved. Realized totals disclose mixed/unknown costs.
 

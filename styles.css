@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('./assets/fonts/fonts.css');
 
 :root {
   --bg-dark: #07090e;
@@ -1224,6 +1224,21 @@ tr:hover td {
 }
 
 @media (max-width: 640px) {
+  .workspace-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .workspace-header > div:first-child {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .workspace-actions,
+  .workspace-breadcrumb {
+    flex-wrap: wrap;
+  }
+  .workspace-title-box {
+    min-width: 0;
+  }
   .kpi-grid {
     grid-template-columns: 1fr;
   }
@@ -1943,6 +1958,8 @@ html:has(.home-page),
     width: 100%;
     max-width: 100%;
     margin: 0;
+  }
+
   .home-stats,
   .home-feature-grid,
   .home-flow,

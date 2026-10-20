@@ -47,3 +47,9 @@ private-recovery/
 recovery-artifacts/
 test-artifacts/
 test-results/
+
+# Generated static deployment output and local Vercel linkage.
+dist/
+.vercel/
+.vercel
+.env*
