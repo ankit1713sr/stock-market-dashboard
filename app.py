@@ -120,6 +120,9 @@ def get_processed_data(symbol, start, end, s_sma, l_sma, rsi_w, bb_s):
 with st.spinner(f"Loading & processing data for {ticker}..."):
     try:
         df = get_processed_data(ticker, start_date, end_date, short_sma, long_sma, rsi_window, bb_std)
+        if df.empty:
+            st.error("No usable historical prices in the selected date range.")
+            st.stop()
         summary = calculate_performance_summary(df)
     except Exception as e:
         st.error(f"Error processing dataset for {ticker}: {e}")
@@ -131,7 +134,7 @@ kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
 last_close = summary['end_price']
 prev_close = df['Close'].iloc[-2] if len(df) > 1 else last_close
 day_change = last_close - prev_close
-day_change_pct = (day_change / prev_close) * 100
+day_change_pct = (day_change / prev_close) * 100 if prev_close else 0.0
 
 with kpi1:
     st.markdown(f"""
@@ -194,24 +197,24 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 with tab1:
     st.subheader("Price Movement & Moving Averages Overlay")
     fig_price = plot_price_and_signals(df, ticker, short_sma, long_sma)
-    st.pyplot(fig_price, use_container_width=True)
+    st.pyplot(fig_price, width="stretch")
     
     st.subheader("Trading Volume & Volatility Dynamics")
     fig_vol = plot_volatility_and_volume(df, ticker)
-    st.pyplot(fig_vol, use_container_width=True)
+    st.pyplot(fig_vol, width="stretch")
 
 with tab2:
     col_ind1, col_ind2 = st.columns(2)
     with col_ind1:
         st.subheader("Relative Strength Index (RSI)")
         fig_rsi = plot_rsi(df, ticker)
-        st.pyplot(fig_rsi, use_container_width=True)
+        st.pyplot(fig_rsi, width="stretch")
         st.info("💡 **RSI Concept**: RSI values > 70 suggest overbought conditions (potential price correction), while RSI < 30 indicates oversold conditions (potential rebound).")
 
     with col_ind2:
         st.subheader("MACD (Moving Average Convergence Divergence)")
         fig_macd = plot_macd(df, ticker)
-        st.pyplot(fig_macd, use_container_width=True)
+        st.pyplot(fig_macd, width="stretch")
         st.info("💡 **MACD Concept**: Bullish momentum increases when the MACD line crosses above the Signal line (green histogram bars).")
 
 with tab3:
@@ -219,7 +222,7 @@ with tab3:
     with col_r1:
         st.subheader("Daily Returns Distribution")
         fig_dist = plot_returns_distribution(df, ticker)
-        st.pyplot(fig_dist, use_container_width=True)
+        st.pyplot(fig_dist, width="stretch")
     
     with col_r2:
         st.subheader("Key Risk Metrics")
@@ -234,10 +237,11 @@ with tab3:
 
 with tab4:
     st.subheader("SMA Crossover Backtesting")
+    st.caption("Signals execute at the next close. Positions retain units until the target changes. This view assumes zero transaction costs.")
     st.write(f"Comparing **{short_sma}-Day / {long_sma}-Day SMA Golden Crossover Strategy** performance against Buy & Hold benchmark.")
     
     fig_strat = plot_cumulative_returns_comparison(df, ticker)
-    st.pyplot(fig_strat, use_container_width=True)
+    st.pyplot(fig_strat, width="stretch")
     
     strat_ret = summary['strategy_total_return'] * 100 if summary['strategy_total_return'] is not None else 0
     bh_ret = summary['total_return'] * 100
@@ -270,13 +274,13 @@ with tab5:
                 combined_returns = pd.DataFrame(returns_dict).dropna()
                 corr_matrix = combined_returns.corr()
                 fig_corr = plot_correlation_heatmap(corr_matrix)
-                st.pyplot(fig_corr, use_container_width=True)
+                st.pyplot(fig_corr, width="stretch")
     else:
         st.info("Select at least 2 tickers to generate correlation matrix.")
 
 with tab6:
     st.subheader("Processed Historical Dataset")
-    st.dataframe(df.style.highlight_null(color='yellow'), use_container_width=True)
+    st.dataframe(df.style.highlight_null(color='yellow'), width="stretch")
     
     csv_bytes = df.to_csv().encode('utf-8')
     st.download_button(

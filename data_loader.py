@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import logging
+import hashlib
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,7 +39,8 @@ def generate_synthetic_data(ticker: str, start_date: str, end_date: str) -> pd.D
     if len(dates) == 0:
         dates = pd.date_range(end=datetime.today(), periods=252, freq='B')
 
-    np.random.seed(hash(ticker) % 2**32)
+    seed = int.from_bytes(hashlib.sha256(ticker.encode()).digest()[:4], "little")
+    rng = np.random.default_rng(seed)
     
     # Base initial prices per ticker family
     base_prices = {
@@ -54,18 +56,18 @@ def generate_synthetic_data(ticker: str, start_date: str, end_date: str) -> pd.D
     mu = 0.0005  # Daily drift
     sigma = 0.02 # Daily volatility
     
-    returns = np.random.normal(mu, sigma, len(dates))
+    returns = rng.normal(mu, sigma, len(dates))
     price_paths = s0 * np.exp(np.cumsum(returns))
     
     # Create Open, High, Low, Close
-    high_noise = np.abs(np.random.normal(0, 0.008, len(dates)))
-    low_noise = np.abs(np.random.normal(0, 0.008, len(dates)))
+    high_noise = np.abs(rng.normal(0, 0.008, len(dates)))
+    low_noise = np.abs(rng.normal(0, 0.008, len(dates)))
     
     close_prices = price_paths
-    open_prices = close_prices * (1 + np.random.normal(0, 0.003, len(dates)))
+    open_prices = close_prices * (1 + rng.normal(0, 0.003, len(dates)))
     high_prices = np.maximum(open_prices, close_prices) * (1 + high_noise)
     low_prices = np.minimum(open_prices, close_prices) * (1 - low_noise)
-    volumes = np.random.randint(10_000_000, 80_000_000, len(dates))
+    volumes = rng.integers(10_000_000, 80_000_000, len(dates))
     
     df = pd.DataFrame({
         'Open': open_prices,
@@ -134,10 +136,11 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     
     # Fill any remaining NaNs
     df.ffill(inplace=True)
-    df.bfill(inplace=True)
+    # Never backfill: leading missing observations have no historical price.
+    df = df.dropna(subset=["Close"])
     
     # Calculate daily percentage returns
-    df['Daily_Return'] = df['Close'].pct_change()
+    df['Daily_Return'] = df['Close'].pct_change(fill_method=None)
     
     # Calculate daily log returns
     df['Log_Return'] = np.log(df['Close'] / df['Close'].shift(1))

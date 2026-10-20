@@ -1,5 +1,11 @@
 import pandas as pd
 import numpy as np
+from backend.app.quant.technicals import (
+    calculate_rsi_wilder, calculate_bollinger_bands as quant_bollinger,
+    calculate_macd as quant_macd,
+)
+from backend.app.quant.metrics import calculate_annualized_metrics
+from backend.app.quant.backtesting import BacktestEngine
 
 def calculate_moving_averages(df: pd.DataFrame, sma_windows=[20, 50, 200], ema_windows=[12, 26]) -> pd.DataFrame:
     """
@@ -18,7 +24,7 @@ def calculate_volatility(df: pd.DataFrame, window: int = 20) -> pd.DataFrame:
     """
     df = df.copy()
     if 'Daily_Return' not in df.columns:
-        df['Daily_Return'] = df['Close'].pct_change()
+        df['Daily_Return'] = df['Close'].pct_change(fill_method=None)
         
     df[f'Rolling_Std_{window}'] = df['Daily_Return'].rolling(window=window).std()
     # Annualized volatility = daily std * sqrt(252 trading days)
@@ -29,112 +35,63 @@ def calculate_bollinger_bands(df: pd.DataFrame, window: int = 20, num_std: float
     """
     Calculates Bollinger Bands (Upper, Lower, Middle).
     """
-    df = df.copy()
-    sma = df['Close'].rolling(window=window).mean()
-    std = df['Close'].rolling(window=window).std()
-    
-    df['BB_Middle'] = sma
-    df['BB_Upper'] = sma + (std * num_std)
-    df['BB_Lower'] = sma - (std * num_std)
-    return df
+    result = quant_bollinger(df, window=window, num_std=num_std)
+    return df.copy().assign(**{col: result[col] for col in result})
+
 
 def calculate_rsi(df: pd.DataFrame, window: int = 14) -> pd.DataFrame:
     """
     Calculates Relative Strength Index (RSI).
     """
-    df = df.copy()
-    delta = df['Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
-    
-    rs = gain / (loss.replace(0, np.nan))
-    rsi = 100 - (100 / (1 + rs))
-    df['RSI'] = rsi.fillna(50)
-    return df
+    return df.copy().assign(RSI=calculate_rsi_wilder(df, period=window))
+
 
 def calculate_macd(df: pd.DataFrame, fast: int = 12, slow: int = 26, signal: int = 9) -> pd.DataFrame:
     """
     Calculates MACD Line, Signal Line, and MACD Histogram.
     """
-    df = df.copy()
-    ema_fast = df['Close'].ewm(span=fast, adjust=False).mean()
-    ema_slow = df['Close'].ewm(span=slow, adjust=False).mean()
-    
-    df['MACD'] = ema_fast - ema_slow
-    df['MACD_Signal'] = df['MACD'].ewm(span=signal, adjust=False).mean()
-    df['MACD_Hist'] = df['MACD'] - df['MACD_Signal']
-    return df
+    result = quant_macd(df, fast=fast, slow=slow, signal=signal)
+    return df.copy().assign(**{col: result[col] for col in result})
 
-def generate_trading_signals(df: pd.DataFrame, short_window: int = 20, long_window: int = 50) -> pd.DataFrame:
-    """
-    Generates trading signals based on SMA Golden/Death Crossover and calculates Strategy Returns.
-    Signal convention: 1 = Buy / Long, -1 = Sell / Short, 0 = Hold / Neutral
+
+def generate_trading_signals(df, short_window=20, long_window=50, cost_model=None):
+    """Causal SMA strategy. A close signal executes at the NEXT close.
+
+    Optional costs are research-only; default zero retains legacy UI controls.
+    Recompute SMAs from each historical prefix, ignoring any supplied SMA values.
     """
     df = df.copy()
-    
-    short_col = f'SMA_{short_window}'
-    long_col = f'SMA_{long_window}'
-    
-    if short_col not in df.columns or long_col not in df.columns:
-        df = calculate_moving_averages(df, sma_windows=[short_window, long_window])
-        
-    df['Signal'] = 0
-    # Position: 1 when short SMA > long SMA, else -1
-    df.loc[df[short_col] > df[long_col], 'Signal'] = 1
-    df.loc[df[short_col] <= df[long_col], 'Signal'] = -1
-    
-    # Crossover Points: 2 = Buy trigger (crossover up), -2 = Sell trigger (crossover down)
-    df['Position_Change'] = df['Signal'].diff()
-    df['Buy_Signal'] = np.where(df['Position_Change'] == 2, df['Close'], np.nan)
-    df['Sell_Signal'] = np.where(df['Position_Change'] == -2, df['Close'], np.nan)
-    
-    # Calculate Strategy Daily Returns (shift signal by 1 day to avoid look-ahead bias)
-    if 'Daily_Return' not in df.columns:
-        df['Daily_Return'] = df['Close'].pct_change()
-        
-    df['Strategy_Return'] = df['Signal'].shift(1) * df['Daily_Return']
-    df['Strategy_Cumulative_Return'] = (1 + df['Strategy_Return'].fillna(0)).cumprod() - 1
-    
+    def strategy(prefix):
+        prices = prefix["Close"]
+        if len(prices) < max(short_window, long_window):
+            return 0.0
+        short = prices.iloc[-short_window:].mean()
+        long = prices.iloc[-long_window:].mean()
+        return 1.0 if short > long else -1.0
+    if short_window <= 0 or long_window <= 0:
+        raise ValueError("SMA windows must be positive")
+    result = BacktestEngine(cost_model=cost_model).run_signal_backtest(df, strategy)
+    history = result.history
+    df["Signal"] = history["Raw_Signal"]
+    df["Position_Change"] = df["Signal"].diff()
+    df["Buy_Signal"] = np.where(df["Position_Change"] > 0, df["Close"], np.nan)
+    df["Sell_Signal"] = np.where(df["Position_Change"] < 0, df["Close"], np.nan)
+    df["Strategy_Return"] = history["Net_Strategy_Return"]
+    df["Strategy_Cumulative_Return"] = history["Portfolio_Value"] / 100000.0 - 1
     return df
 
-def calculate_performance_summary(df: pd.DataFrame) -> dict:
-    """
-    Calculates summary performance metrics including Period Return, Volatility, Sharpe Ratio, and Max Drawdown.
-    """
-    if 'Daily_Return' not in df.columns:
-        df = df.copy()
-        df['Daily_Return'] = df['Close'].pct_change()
 
-    total_return = (df['Close'].iloc[-1] / df['Close'].iloc[0]) - 1
-    daily_mean = df['Daily_Return'].mean()
-    daily_std = df['Daily_Return'].std()
-    
-    # Annualized Metrics
-    ann_return = ((1 + daily_mean) ** 252) - 1 if not np.isnan(daily_mean) else 0.0
-    ann_volatility = daily_std * np.sqrt(252) if not np.isnan(daily_std) else 0.0
-    
-    # Sharpe Ratio (Assuming 2% Risk-Free Rate)
-    rf = 0.02
-    sharpe_ratio = (ann_return - rf) / ann_volatility if ann_volatility > 0 else 0.0
-    
-    # Maximum Drawdown
-    cum_returns = (1 + df['Daily_Return'].fillna(0)).cumprod()
-    peak = cum_returns.cummax()
-    drawdown = (cum_returns - peak) / peak
-    max_drawdown = drawdown.min()
-    
-    # Strategy Return comparison if calculated
-    strat_total_return = None
-    if 'Strategy_Cumulative_Return' in df.columns:
-        strat_total_return = df['Strategy_Cumulative_Return'].iloc[-1]
-
+def calculate_performance_summary(df):
+    """Shared validated metrics, retaining the Streamlit response keys."""
+    prices = df["Close"].astype(float)
+    returns = prices.pct_change(fill_method=None).iloc[1:]
+    metrics = calculate_annualized_metrics(returns)
     return {
-        "start_price": float(df['Close'].iloc[0]),
-        "end_price": float(df['Close'].iloc[-1]),
-        "total_return": float(total_return),
-        "ann_return": float(ann_return),
-        "ann_volatility": float(ann_volatility),
-        "sharpe_ratio": float(sharpe_ratio),
-        "max_drawdown": float(max_drawdown),
-        "strategy_total_return": float(strat_total_return) if strat_total_return is not None else None
+        "start_price": float(prices.iloc[0]) if len(prices) else 0.0,
+        "end_price": float(prices.iloc[-1]) if len(prices) else 0.0,
+        "total_return": metrics["total_return"], "ann_return": metrics["ann_return"],
+        "ann_volatility": metrics["ann_volatility"], "sharpe_ratio": metrics["sharpe_ratio"],
+        "max_drawdown": metrics["max_drawdown_pct"] / 100,
+        "strategy_total_return": float(df["Strategy_Cumulative_Return"].iloc[-1])
+        if len(df) and "Strategy_Cumulative_Return" in df else None,
     }
