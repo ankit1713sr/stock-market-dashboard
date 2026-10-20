@@ -3,300 +3,255 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TradePulse AI – Smart AI Trading Journal & Performance Analytics</title>
-
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <title>TradePulse AI - Smart Trading Journal & Performance Analytics</title>
+  <link rel="stylesheet" href="styles.css?v=navbar-logo-2">
 </head>
-<body>
+<body class="home-page">
 
-  <!-- Top Marquee Ticker Bar -->
   <div class="ticker-marquee">
     <div class="marquee-content">
-      <span class="marquee-item">AAPL: <span class="text-green">$185.40 (+1.2%)</span></span>
-      <span class="marquee-item">MSFT: <span class="text-green">$422.10 (+0.8%)</span></span>
-      <span class="marquee-item">NVDA: <span class="text-green">$128.50 (+3.4%)</span></span>
-      <span class="marquee-item">TSLA: <span class="text-red">$224.80 (-1.5%)</span></span>
-      <span class="marquee-item">META: <span class="text-green">$512.30 (+2.4%)</span></span>
-      <span class="marquee-item">AMZN: <span class="text-green">$186.70 (+1.1%)</span></span>
-      <span class="marquee-item">NFLX: <span class="text-green">$654.20 (+1.9%)</span></span>
-      <span class="marquee-item">AMD: <span class="text-red">$149.80 (-0.7%)</span></span>
-      <span class="marquee-item">JPM: <span class="text-green">$211.50 (+0.5%)</span></span>
-      <span class="marquee-item">BTC-USD: <span class="text-green">$64,250 (+2.1%)</span></span>
-      <span class="marquee-item">ETH-USD: <span class="text-green">$3,420 (+1.8%)</span></span>
-      <span class="marquee-item">RELIANCE: <span class="text-green">₹3,015 (+1.4%)</span></span>
-      <span class="marquee-item">NIFTY 50: <span class="text-green">25,350 (+0.6%)</span></span>
-      <span class="marquee-item">BANKNIFTY: <span class="text-green">51,800 (+0.9%)</span></span>
+      <span class="ticker-live-badge"><span class="live-dot"></span> ILLUSTRATIVE QUOTES — NOT LIVE</span>
+      <span class="marquee-item"><span class="marquee-symbol">AAPL</span> <span class="text-green">$185.40 +1.2%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">MSFT</span> <span class="text-green">$422.10 +0.8%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">NVDA</span> <span class="text-green">$128.50 +3.4%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">TSLA</span> <span class="text-red">$224.80 -1.5%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">BTC-USD</span> <span class="text-green">$64,250 +2.1%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">ETH-USD</span> <span class="text-green">$3,420 +1.8%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">NIFTY 50</span> <span class="text-green">25,350 +0.6%</span></span>
+      <span class="marquee-item"><span class="marquee-symbol">BANKNIFTY</span> <span class="text-green">51,800 +0.9%</span></span>
     </div>
   </div>
 
-  <div class="dashboard-container">
-    
-    <!-- Navbar Header -->
-    <header class="navbar">
-      <div class="brand">
-        <a href="index.html" style="text-decoration:none; display:flex; align-items:center; gap:14px;">
-          <div class="brand-icon">⚡</div>
-          <div class="brand-text">
-            <h1>TradePulse AI</h1>
-            <p>Smart AI-Powered Trading Journal & Performance Analytics</p>
-          </div>
-        </a>
-      </div>
+  <header class="home-nav">
+    <a href="index.html" class="home-brand" aria-label="TradePulse AI home">
+      <img src="assets/logo/tradepulse-ai-horizontal.png" alt="TradePulse AI" class="home-brand-logo">
+    </a>
 
-      <div class="user-profile-bar">
-        <a href="#features" class="btn-hero-secondary" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">Features</a>
-        <a href="#how-it-works" class="btn-hero-secondary" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">How It Works</a>
-        <a href="#testimonials" class="btn-hero-secondary" style="padding: 8px 16px; font-size: 13px; text-decoration: none;">Testimonials</a>
+    <nav class="home-nav-links" aria-label="Primary navigation">
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#analytics">Analytics</a>
+      <a href="#testimonials">Results</a>
+    </nav>
 
-        <a href="dashboard.html" class="btn-add-trade" style="text-decoration:none;">
-          <span>🚀 Launch App Workspace</span>
-        </a>
-      </div>
-    </header>
+    <a href="dashboard.html" class="home-nav-cta">Launch Workspace</a>
+  </header>
 
-    <!-- Hero Section -->
-    <div class="home-hero-grid">
-      <div class="hero-text-box">
-        <div class="home-announcement-bar">
-          <span>⚡ NEW: TradePulse AI v2.5 Launch</span>
-          <span>•</span>
-          <span style="color:#ffffff;">AI Coach & Risk Guard Active</span>
+  <main>
+    <section class="home-hero" aria-labelledby="hero-title">
+      <img class="home-hero-image" src="assets/homepage-hero-terminal.png" alt="TradePulse AI trading analytics dashboard on a professional trading desk">
+      <div class="home-hero-overlay"></div>
+      <div class="home-hero-content reveal-on-load">
+        <div class="home-eyebrow">
+          <span class="live-dot"></span>
+          Trading journal and analytics · optional Python API
         </div>
-        <h1>Stop Trading Blind. <br>Master Your Edge with AI.</h1>
-        <p>
-          The ultimate AI-powered trading journal & quantitative analytics platform for Stock, Options, Crypto, and Forex traders. Log trades effortlessly, eliminate emotional execution mistakes, and protect your capital.
+        <h1 id="hero-title">TradePulse AI</h1>
+        <p class="home-hero-copy">
+          A premium trading journal for disciplined traders who want clean execution records, Python-backed performance analytics, risk controls, and market context in one focused workspace.
         </p>
-        <div class="hero-cta-group">
-          <a href="dashboard.html" class="btn-hero-primary" style="text-decoration:none;">
-            <span>🚀 Open Trading Dashboard</span>
-          </a>
-          <a href="dashboard.html" class="btn-hero-secondary" style="text-decoration:none;">
-            <span>🔐 Quick Demo Portal</span>
-          </a>
+        <div class="home-actions">
+          <a href="dashboard.html" class="home-primary-action">Open Trading Dashboard</a>
+          <a href="#features" class="home-secondary-action">Explore Features</a>
         </div>
-        <div class="hero-trust-badges">
-          <span>🔒 Bank-Grade Encryption</span>
-          <span>⚡ Real-Time Analytics</span>
-          <span>🇮🇳 Indian Equities & Global Markets</span>
+        <div class="home-hero-meta" aria-label="Platform highlights">
+          <span>Offline cache / optional API persistence</span>
+          <span>Python analytics</span>
+          <span>Vanilla JavaScript UI</span>
         </div>
       </div>
 
-      <div class="hero-visual-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <div style="font-size:12px; color:var(--text-muted); font-weight:700;">LIVE PERFORMANCE PREVIEW</div>
-            <div style="font-family:'Outfit',sans-serif; font-size:24px; font-weight:800; color:var(--green-accent);">+$14,250.00 (+18.4%)</div>
-          </div>
-          <span class="tag-pill tag-disciplined" style="font-size:12px; padding:6px 12px;">72.4% Win Rate</span>
+      <aside class="home-floating-panel reveal-on-load" aria-label="Fictional performance illustration, not your account">
+        <div class="home-panel-header">
+          <span>Fictional example · not your account</span>
+          <strong class="text-green">Illustrative results</strong>
         </div>
-
-        <div style="height: 180px; width:100%; margin-bottom:16px;">
-          <svg viewBox="0 0 400 130" preserveAspectRatio="none" style="width:100%; height:100%;">
-            <path d="M0 110 L40 90 L80 100 L120 70 L160 85 L200 55 L240 65 L280 40 L320 55 L360 30 L400 40 L400 130 L0 130 Z" fill="rgba(6, 182, 212, 0.15)" />
-            <path d="M0 110 L40 90 L80 100 L120 70 L160 85 L200 55 L240 65 L280 40 L320 55 L360 30 L400 40" fill="none" stroke="#06b6d4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="400" cy="40" r="5" fill="#10b981" />
-          </svg>
+        <div class="home-panel-value text-green">+$14,250</div>
+        <div class="home-mini-chart" aria-hidden="true">
+          <span style="height:34%"></span>
+          <span style="height:46%"></span>
+          <span style="height:38%"></span>
+          <span style="height:62%"></span>
+          <span style="height:54%"></span>
+          <span style="height:76%"></span>
+          <span style="height:68%"></span>
+          <span style="height:88%"></span>
         </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; text-align:center;">
-          <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; border:1px solid var(--border-card);">
-            <div style="font-size:11px; color:var(--text-muted);">Profit Factor</div>
-            <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--cyan-accent); font-size:16px;">2.85</div>
-          </div>
-          <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; border:1px solid var(--border-card);">
-            <div style="font-size:11px; color:var(--text-muted);">Execution Score</div>
-            <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--green-accent); font-size:16px;">9.8 / 10</div>
-          </div>
-          <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; border:1px solid var(--border-card);">
-            <div style="font-size:11px; color:var(--text-muted);">Mistake Leaks</div>
-            <div style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--green-accent); font-size:16px;">$0.00</div>
-          </div>
+        <div class="home-panel-grid">
+          <div><small>Win Rate</small><strong>72.4%</strong></div>
+          <div><small>Profit Factor</small><strong>2.85</strong></div>
+          <div><small>Avg R</small><strong>1.74R</strong></div>
         </div>
-      </div>
-    </div>
+      </aside>
+    </section>
 
-    <!-- Stats Band -->
-    <div class="stats-band">
-      <div>
-        <div class="stat-band-num">1.5M+</div>
-        <div class="stat-band-label">Trades Logged & Analyzed</div>
-      </div>
-      <div>
-        <div class="stat-band-num" style="color:var(--green-accent);">2.8x</div>
-        <div class="stat-band-label">Trader Profitability Multiplier</div>
-      </div>
-      <div>
-        <div class="stat-band-num" style="color:var(--purple-accent);">-68%</div>
-        <div class="stat-band-label">Reduction in FOMO & Revenge Trades</div>
-      </div>
-      <div>
-        <div class="stat-band-num" style="color:var(--yellow-accent);">18,500+</div>
-        <div class="stat-band-label">Active Global Traders</div>
-      </div>
-    </div>
+    <section class="home-stats reveal-section" aria-label="TradePulse AI capabilities">
+      <div><strong>Journal</strong><span>Entries, exits, and execution notes</span></div>
+      <div><strong>Risk</strong><span>Position sizing and review tools</span></div>
+      <div><strong>Analytics</strong><span>Calendar and strategy breakdowns</span></div>
+      <div><strong>Offline</strong><span>Local cache; optional Python API</span></div>
+    </section>
 
-    <!-- Features Matrix Section -->
-    <section id="features">
+    <section id="features" class="home-section reveal-section">
       <div class="home-section-head">
-        <h2>Everything You Need to <em>Build & Scale</em> Your Edge</h2>
-        <p>Built for serious traders who value systematic discipline over emotion.</p>
+        <span>Core System</span>
+        <h2>Built for repeatable execution, not noisy dashboards.</h2>
+        <p>TradePulse keeps the existing dark fintech terminal feel while giving each workflow a clear job: log, analyze, review, size risk, and improve.</p>
       </div>
 
-      <div class="feature-matrix-grid">
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">🤖</div>
-          <h3>AI Performance Coach</h3>
-          <p>Instant plain-English diagnosis highlighting your top win-rate strategies, optimal trading hours, and exact dollar cost of execution mistakes.</p>
-        </div>
-
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">🛡️</div>
-          <h3>Prop Firm Risk Guard</h3>
-          <p>Set hard daily max loss limits and loss streak thresholds. Triggers immediate protocol warnings to halt emotional revenge trading.</p>
-        </div>
-
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">📐</div>
-          <h3>Smart Position Sizer</h3>
-          <p>Calculate exact recommended shares and contracts instantly based on account balance, risk tolerance %, entry price, and stop loss distance.</p>
-        </div>
-
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">📅</div>
-          <h3>Interactive P&L Calendar</h3>
-          <p>Color-coded monthly heatmap grid showing daily net P&L and % return with single-click trade detail inspection for every trading session.</p>
-        </div>
-
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">📚</div>
-          <h3>Pre-Trade Playbook</h3>
-          <p>Interactive setup checklist enforcing timeframe alignment, volume confirmation, and minimum 2:1 Risk:Reward discipline before trade entry.</p>
-        </div>
-
-        <div class="home-feature-card">
-          <div class="feature-icon-wrapper">📊</div>
-          <h3>Live Technical Charting</h3>
-          <p>Candlestick market charts with SMA 20/50, Bollinger Bands, RSI, and MACD indicators for US Megacap Tech, Crypto, and Indian Equities.</p>
-        </div>
+      <div class="home-feature-grid">
+        <article class="home-feature-card">
+          <span class="home-card-index">01</span>
+          <h3>Trade Journal Engine</h3>
+          <p>Log entries, exits, size, setup, emotion, mistake, chart notes, and execution quality through a clean modal workflow.</p>
+        </article>
+        <article class="home-feature-card">
+          <span class="home-card-index">02</span>
+          <h3>Python P&amp;L Math</h3>
+          <p>When connected, the Python API validates costs and calculates P&amp;L, return, risk, and R-multiple. Offline mode uses local calculations with disclosed limitations.</p>
+        </article>
+        <article class="home-feature-card">
+          <span class="home-card-index">03</span>
+          <h3>P&amp;L Calendar</h3>
+          <p>A month-by-month heatmap exposes daily performance clusters, loss streaks, and consistency patterns at a glance.</p>
+        </article>
+        <article class="home-feature-card">
+          <span class="home-card-index">04</span>
+          <h3>Risk Controls</h3>
+          <p>Position sizing and daily drawdown guardrails help traders define loss before entry and protect capital after mistakes.</p>
+        </article>
       </div>
     </section>
 
-    <!-- How It Works (3 Steps) -->
-    <section id="how-it-works">
+    <section id="workflow" class="home-section home-workflow reveal-section">
       <div class="home-section-head">
-        <h2>How <em>TradePulse AI</em> Works</h2>
-        <p>Three simple steps to transform your trading consistency.</p>
+        <span>Workflow</span>
+        <h2>From trade entry to behavioral insight in three steps.</h2>
       </div>
 
-      <div class="steps-flow-container">
-        <div class="step-card">
-          <div class="step-number-badge">1</div>
-          <h3 style="font-family:'Outfit',sans-serif; font-size:18px; margin-bottom:8px;">Log & Tag Trades</h3>
-          <p style="font-size:14px; color:var(--text-muted);">Record entry/exit prices, asset class, strategy setup, emotion, and chart snapshots in seconds.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-number-badge">2</div>
-          <h3 style="font-family:'Outfit',sans-serif; font-size:18px; margin-bottom:8px;">AI Diagnosis & Review</h3>
-          <p style="font-size:14px; color:var(--text-muted);">The AI Coach analyzes your trading pattern and pinpoints emotional leaks like FOMO or early exits.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-number-badge">3</div>
-          <h3 style="font-family:'Outfit',sans-serif; font-size:18px; margin-bottom:8px;">Protect & Scale Capital</h3>
-          <p style="font-size:14px; color:var(--text-muted);">Use the Position Calculator and Risk Guard to manage risk and scale your account with 100% discipline.</p>
-        </div>
+      <div class="home-flow">
+        <article>
+          <b>01</b>
+          <h3>Capture the trade</h3>
+          <p>Record the symbol, side, entry, exit, quantity, strategy, emotion, mistake, rating, and optional chart reference.</p>
+        </article>
+        <article>
+          <b>02</b>
+          <h3>Let the API calculate</h3>
+          <p>With a configured backend, FastAPI validates and persists records and Python computes the metrics. Otherwise, records stay in this browser.</p>
+        </article>
+        <article>
+          <b>03</b>
+          <h3>Review the edge</h3>
+          <p>Use the calendar, equity curve, strategy breakdowns, mistake analytics, and market charts to refine the next trade.</p>
+        </article>
       </div>
     </section>
 
-    <!-- Comparison Matrix -->
-    <div class="home-section-head">
-      <h2>TradePulse AI vs. <em>Manual Spreadsheets</em></h2>
-      <p>Why professional traders upgrade from Excel & paper logs.</p>
-    </div>
-
-    <table class="home-compare-table">
-      <thead>
-        <tr>
-          <th>Platform Capability</th>
-          <th style="color:var(--cyan-accent); font-weight:700;">⚡ TradePulse AI</th>
-          <th>📊 Excel / Paper Journal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>AI Behavioral Diagnosis & Leak Detection</td>
-          <td style="color:var(--green-accent); font-weight:700;">✅ Automated Plain-English Insights</td>
-          <td style="color:var(--red-accent);">❌ None</td>
-        </tr>
-        <tr>
-          <td>Prop Firm Daily Risk Guard Alerts</td>
-          <td style="color:var(--green-accent); font-weight:700;">✅ Automated Breach Warning</td>
-          <td style="color:var(--red-accent);">❌ Manual (Easy to ignore)</td>
-        </tr>
-        <tr>
-          <td>Interactive Position Size Calculator</td>
-          <td style="color:var(--green-accent); font-weight:700;">✅ Built-in Share / Risk Math</td>
-          <td style="color:var(--red-accent);">❌ Complex formulas needed</td>
-        </tr>
-        <tr>
-          <td>Multi-Account Partitioning (Prop vs Personal)</td>
-          <td style="color:var(--green-accent); font-weight:700;">✅ 1-Click Instant Switcher</td>
-          <td style="color:var(--red-accent);">❌ Separate file clutter</td>
-        </tr>
-        <tr>
-          <td>Interactive Chart Snapshots & Lightbox</td>
-          <td style="color:var(--green-accent); font-weight:700;">✅ Embedded 📸 Lightbox Viewer</td>
-          <td style="color:var(--red-accent);">❌ Broken image links</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Testimonials Section -->
-    <section id="testimonials">
-      <div class="home-section-head">
-        <h2>What <em>Serious Traders</em> Say</h2>
-        <p>Real feedback from traders who transformed their performance.</p>
+    <section id="analytics" class="home-section home-analytics-band reveal-section">
+      <div>
+        <span class="home-section-kicker">Quant Workspace</span>
+        <h2>One workspace for trading review and cost-aware analytics.</h2>
+        <p>This static frontend runs independently. A separately hosted Python API enables validated accounting and database persistence. Without it, the workspace shows clearly labeled local-cache or fictional demo data.</p>
       </div>
-
-      <div class="grid-2" style="margin-bottom: 64px;">
-        <div class="chart-card">
-          <div style="color:var(--yellow-accent); font-size:18px; margin-bottom:8px;">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:14px; color:var(--text-main); font-style:italic; margin-bottom:12px;">
-            "The AI Coach identified that my FOMO trades on Monday mornings were eating away 40% of my net profits. Once I fixed that rule, my account turned profitable."
-          </p>
-          <div style="font-weight:700; color:var(--cyan-accent); font-size:14px;">Abhay K.</div>
-          <div style="font-size:12px; color:var(--text-muted);">Intraday Options Trader</div>
-        </div>
-
-        <div class="chart-card">
-          <div style="color:var(--yellow-accent); font-size:18px; margin-bottom:8px;">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:14px; color:var(--text-main); font-style:italic; margin-bottom:12px;">
-            "The Prop Firm Risk Guard saved me from blowing my funded evaluation twice this month. The position calculator is lightning fast."
-          </p>
-          <div style="font-weight:700; color:var(--cyan-accent); font-size:14px;">Vikram S.</div>
-          <div style="font-size:12px; color:var(--text-muted);">Prop Firm Swing Trader</div>
-        </div>
+      <div class="home-analytics-list">
+        <span>CRUD-backed journal</span>
+        <span>Equity curve ranges</span>
+        <span>Strategy analytics</span>
+        <span>Emotion analytics</span>
+        <span>Mistake tracking</span>
+        <span>Market data endpoint</span>
       </div>
     </section>
 
-    <!-- Bottom CTA Banner -->
-    <div class="chart-card" style="text-align:center; padding:40px 20px; background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(168,85,247,0.15)); border-color:var(--cyan-accent);">
-      <h2 style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; margin-bottom:12px;">Ready to Elevate Your Trading Edge?</h2>
-      <p style="color:var(--text-muted); margin-bottom:24px; max-width:500px; margin-left:auto; margin-right:auto;">
-        Join thousands of disciplined stock, options, crypto, and forex traders using TradePulse AI.
-      </p>
-      <a href="dashboard.html" class="btn-hero-primary" style="text-decoration:none;">
-        <span>🚀 Open Live Dashboard Now</span>
-      </a>
-    </div>
+    <section class="home-section reveal-section">
+      <div class="home-section-head">
+        <span>Comparison</span>
+        <h2>Why this feels sharper than a spreadsheet.</h2>
+      </div>
 
-  </div>
+      <div class="home-compare-wrap">
+        <table class="home-compare-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>TradePulse AI</th>
+              <th>Manual Journal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Trade calculations</td>
+              <td>Python calculations when connected; disclosed local fallback offline</td>
+              <td>Manual formulas that drift over time</td>
+            </tr>
+            <tr>
+              <td>Behavior review</td>
+              <td>Emotion and mistake analytics by realized P&amp;L</td>
+              <td>Hard to spot patterns without cleanup</td>
+            </tr>
+            <tr>
+              <td>Risk discipline</td>
+              <td>Position sizing and daily risk guard in the workspace</td>
+              <td>Separate calculator or mental math</td>
+            </tr>
+            <tr>
+              <td>Trade context</td>
+              <td>Candlestick detail with entry, exit, stop, and target markers</td>
+              <td>Disconnected screenshots and notes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-  <footer style="text-align:center; padding:30px 20px; border-top:1px solid var(--border-card); font-size:13px; color:var(--text-dim); margin-top:40px;">
-    © 2026 TradePulse AI. Smart AI-Powered Trading Journal & Performance Analytics. All rights reserved.
+    <section id="testimonials" class="home-section reveal-section">
+      <div class="home-section-head">
+        <span>Illustrative Review Prompts</span>
+        <h2>Designed for serious review sessions.</h2>
+      </div>
+
+      <div class="home-testimonial-grid">
+        <article class="home-quote-card">
+          <p>"Which setups followed my plan, and which trades were driven by emotion?"</p>
+          <strong>Execution review prompt</strong>
+        </article>
+        <article class="home-quote-card">
+          <p>"What is my planned risk, and what can I learn from the last trading session?"</p>
+          <strong>Risk review prompt</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="home-final-cta reveal-section">
+      <span>TradePulse AI Workspace</span>
+      <h2>Review the last trade. Improve the next one.</h2>
+      <p>Launch the dashboard to log trades, inspect the P&amp;L calendar, review strategy analytics, and size risk before entry.</p>
+      <a href="dashboard.html" class="home-primary-action">Launch Trading Workspace</a>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <span>TradePulse AI</span>
+    <span>Python + FastAPI + SQLite + Vanilla JavaScript</span>
   </footer>
 
+  <script>
+    document.documentElement.style.scrollBehavior = 'smooth';
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.16 });
+
+    document.querySelectorAll('.reveal-section').forEach((section) => {
+      revealObserver.observe(section);
+    });
+
+  </script>
 </body>
 </html>

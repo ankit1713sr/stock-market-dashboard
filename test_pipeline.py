@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg') # Headless mode for testing
 
-from data_loader import fetch_stock_data, preprocess_data
+from data_loader import generate_synthetic_data, preprocess_data
 from analytics import (
     calculate_moving_averages,
     calculate_volatility,
@@ -24,7 +24,7 @@ from visualizer import (
 
 def run_tests():
     print("--- 1. Testing Data Loader ---")
-    df_raw = fetch_stock_data("AAPL", "2023-01-01", "2024-01-01")
+    df_raw = generate_synthetic_data("AAPL", "2023-01-01", "2024-01-01")
     assert not df_raw.empty, "Fetched data is empty!"
     print(f"Data shape: {df_raw.shape}, Columns: {list(df_raw.columns)}")
 
@@ -62,9 +62,18 @@ def run_tests():
     fig4 = plot_volatility_and_volume(df, "AAPL")
     fig5 = plot_returns_distribution(df, "AAPL")
     fig6 = plot_cumulative_returns_comparison(df, "AAPL")
-    print("All Matplotlib/Seaborn figures generated successfully!")
+    import matplotlib.pyplot as plt
+    for figure in (fig1, fig2, fig3, fig4, fig5, fig6):
+        figure.canvas.draw()
+        plt.close(figure)
+    print("All Matplotlib/Seaborn figures rendered successfully!")
 
     print("\n[OK] ALL PIPELINE TESTS PASSED CLEANLY!")
+
+def test_offline_pipeline():
+    """Deterministic, network-independent end-to-end analytics/plot smoke test."""
+    run_tests()
+
 
 if __name__ == "__main__":
     run_tests()

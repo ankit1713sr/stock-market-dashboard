@@ -1,8 +1,19 @@
 # ⚡ TradePulse AI – Smart Trading Journal & Market Analytics
 
-**TradePulse AI** is a comprehensive, AI-powered trading journal and quantitative performance analytics platform built with **HTML5**, **CSS3 (Cyber-Dark Glassmorphism design)**, **JavaScript**, and **Plotly.js**. 
+**TradePulse AI** is a comprehensive, AI-powered trading journal and quantitative performance analytics platform built with **PYTHON** **HTML5**, **CSS3 (Cyber-Dark Glassmorphism design)**, **JavaScript**, and **Plotly.js**.
 
 Designed for stock, options, crypto, and forex traders to log trades, track net P&L, analyze trading psychology, eliminate execution mistakes, and review live market technical charts.
+
+Step 2 adds explicitly versioned, additive cost-accounting migrations and verified
+backup/restore tools. The repository database remains protected and unmigrated;
+see [the database and accounting runbook](docs/database-runbook.md) before selecting
+a disposable or separately approved operational database. Mixed legacy and net
+reporting is labeled; unknown historical fees are never treated as reported zero.
+
+No SQLite database or private trade history is shipped. Tests generate fictional,
+deterministic legacy fixtures. See [public checkout setup](docs/public-checkout.md)
+for installing dependencies, creating a separate fictional demo database, and
+running the API, frontend, Streamlit app, and verification suites.
 
 ---
 
